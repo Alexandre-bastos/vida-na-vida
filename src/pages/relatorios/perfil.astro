@@ -13,9 +13,20 @@ if (userRole !== 'ADMIN' && userRole !== 'COORDENADOR') {
   return Astro.redirect('/');
 }
 
+// Extrair filtros
+const url = new URL(Astro.request.url);
+const startParam = url.searchParams.get('startDate');
+const endParam = url.searchParams.get('endDate');
+const cellId = url.searchParams.get('cellId');
+
+const startDate = startParam ? new Date(startParam) : null;
+const endDate = endParam ? new Date(endParam) : new Date();
+
+const cellMembershipFilter = cellId ? { cellHistory: { some: { cellId, endDate: null } } } : {};
+
 // Buscar todos os membros ativos
 const activeMembers = await prisma.user.findMany({
-  where: { active: true },
+  where: { active: true, ...cellMembershipFilter },
   include: {
     cellHistory: {
       where: { endDate: null },
@@ -67,13 +78,7 @@ const ageData = [
   ...(unknownAge > 0 ? [{ name: 'Não informado', value: unknownAge }] : [])
 ];
 
-// Extrair filtros de data
-const url = new URL(Astro.request.url);
-const startParam = url.searchParams.get('startDate');
-const endParam = url.searchParams.get('endDate');
-
-const startDate = startParam ? new Date(startParam) : null;
-const endDate = endParam ? new Date(endParam) : new Date();
+// As variáveis startParam, endParam já foram movidas para cima.
 
 // Identificar membros ativos que não têm nenhuma presença no período selecionado (Desaparecidos)
 const alertStartDate = startDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
@@ -81,6 +86,7 @@ const alertStartDate = startDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 10
 const missingMembers = await prisma.user.findMany({
   where: {
     active: true,
+    ...cellMembershipFilter,
     presences: {
       none: {
         isPresent: true,

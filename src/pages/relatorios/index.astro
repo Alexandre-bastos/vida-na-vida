@@ -16,14 +16,18 @@ if (userRole !== 'ADMIN' && userRole !== 'COORDENADOR') {
 const url = new URL(Astro.request.url);
 const startParam = url.searchParams.get('startDate');
 const endParam = url.searchParams.get('endDate');
+const cellId = url.searchParams.get('cellId');
 
 const startDate = startParam ? new Date(startParam) : null;
 const endDate = endParam ? new Date(endParam) : new Date();
 
+const cellFilter = cellId ? { id: cellId } : {};
+const cellMembershipFilter = cellId ? { cellHistory: { some: { cellId, endDate: null } } } : {};
+
 // Buscar Indicadores Principais
-const activeCellsCount = await prisma.cell.count();
-const activeMembersCount = await prisma.user.count({ where: { active: true } });
-const inactiveMembersCount = await prisma.user.count({ where: { active: false } });
+const activeCellsCount = await prisma.cell.count({ where: cellFilter });
+const activeMembersCount = await prisma.user.count({ where: { active: true, ...cellMembershipFilter } });
+const inactiveMembersCount = await prisma.user.count({ where: { active: false, ...cellMembershipFilter } });
 
 // Novos Membros no período selecionado
 const newMembersCount = await prisma.user.count({
@@ -32,7 +36,8 @@ const newMembersCount = await prisma.user.count({
     createdAt: {
       gte: startDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
       lte: endDate
-    }
+    },
+    ...cellMembershipFilter
   }
 });
 
@@ -42,6 +47,7 @@ const alertStartDate = startDate || new Date(Date.now() - 14 * 24 * 60 * 60 * 10
 
 const cellsWithoutRecentMeetings = await prisma.cell.findMany({
   where: {
+    ...cellFilter,
     meetings: {
       none: {
         date: {
@@ -55,6 +61,7 @@ const cellsWithoutRecentMeetings = await prisma.cell.findMany({
 
 // Líderes em treinamento por célula
 const cellsWithLeaders = await prisma.cell.findMany({
+  where: cellFilter,
   include: {
     memberships: {
       where: { endDate: null, user: { role: 'LIDER_TREINAMENTO' } },
@@ -66,12 +73,13 @@ const cellsWithLeaders = await prisma.cell.findMany({
 // Bairros
 const cellNeighborhoods = await prisma.cell.groupBy({
   by: ['neighborhood'],
+  where: cellFilter,
   _count: true
 });
 
 const memberNeighborhoods = await prisma.user.groupBy({
   by: ['neighborhood'],
-  where: { active: true },
+  where: { active: true, ...cellMembershipFilter },
   _count: true
 });
 ---

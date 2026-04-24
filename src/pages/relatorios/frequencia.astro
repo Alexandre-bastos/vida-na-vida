@@ -17,16 +17,21 @@ if (userRole !== 'ADMIN' && userRole !== 'COORDENADOR') {
 const url = new URL(Astro.request.url);
 const startParam = url.searchParams.get('startDate');
 const endParam = url.searchParams.get('endDate');
+const cellId = url.searchParams.get('cellId');
 
 const startDate = startParam ? new Date(startParam) : null;
 const endDate = endParam ? new Date(endParam) : new Date();
 
-const dateFilter = {
+const dateFilter: any = {
   date: {
     gte: startDate || undefined,
     lte: endDate
   }
 };
+
+if (cellId) {
+  dateFilter.cellId = cellId;
+}
 
 // Buscar encontros no período
 const recentMeetings = await prisma.meeting.findMany({

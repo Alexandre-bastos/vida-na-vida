@@ -1,6 +1,8 @@
 ---
 import AppLayout from './AppLayout.astro';
 import { LayoutDashboard, Activity, Users, ChevronLeft, Megaphone } from 'lucide-react';
+import { getSession } from 'auth-astro/server';
+import prisma from '../lib/prisma';
 
 interface Props {
   title: string;
@@ -12,8 +14,21 @@ const { title, activeTab } = Astro.props;
 const url = new URL(Astro.request.url);
 const startDate = url.searchParams.get('startDate') || '';
 const endDate = url.searchParams.get('endDate') || '';
+const cellId = url.searchParams.get('cellId') || '';
 
-const filterParams = `?startDate=${startDate}&endDate=${endDate}`;
+const filterParams = `?startDate=${startDate}&endDate=${endDate}&cellId=${cellId}`;
+
+// Fetch available cells for the filter
+const session = await getSession(Astro.request);
+const userRole = (session?.user as any)?.role || 'MEMBRO';
+const userId = (session?.user as any)?.id;
+
+let availableCells: any[] = [];
+if (userRole === 'ADMIN' || userRole === 'COORDENADOR') {
+  availableCells = await prisma.cell.findMany({ orderBy: { name: 'asc' } });
+} else if (userRole === 'LIDER' || userRole === 'LIDER_TREINAMENTO') {
+  availableCells = await prisma.cell.findMany({ where: { leaderId: userId }, orderBy: { name: 'asc' } });
+}
 
 const tabs = [
   { id: 'geral', label: 'Board Geral', icon: LayoutDashboard, href: `/relatorios${filterParams}` },
@@ -69,10 +84,19 @@ const tabs = [
         <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Até</label>
         <input type="date" name="endDate" value={endDate} class="w-full px-4 py-2.5 rounded-xl border border-gray-50 bg-gray-50/50 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/20" />
       </div>
+      <div class="flex-1 min-w-[160px] space-y-1">
+        <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Célula</label>
+        <select name="cellId" class="w-full px-4 py-2.5 rounded-xl border border-gray-50 bg-gray-50/50 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary/20 appearance-none truncate">
+          <option value="">Todas as Células</option>
+          {availableCells.map(c => (
+            <option value={c.id} selected={c.id === cellId}>{c.name}</option>
+          ))}
+        </select>
+      </div>
       <button type="submit" class="px-6 py-2.5 bg-brand-primary text-white rounded-xl font-bold text-sm hover:brightness-110 transition-all shadow-md shadow-brand-primary/20 h-[42px]">
         Filtrar
       </button>
-      {(startDate || endDate) && (
+      {(startDate || endDate || cellId) && (
         <a href={Astro.url.pathname} class="px-4 py-2.5 text-gray-400 text-xs font-medium hover:text-brand-primary">Limpar</a>
       )}
     </form>

@@ -225,20 +225,20 @@ if (Astro.request.method === 'POST') {
 		<!-- Definir Líder da Célula -->
 		{(isAdmin || isCoordinator) && (
 		<section class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-gray-100">
-			<div class="flex items-center justify-between">
+			<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 				<div>
 					<h3 class="font-bold text-sm">Definir Líder</h3>
 					<p class="text-xs text-gray-400">Escolha o líder responsável por esta célula.</p>
 				</div>
-				<form method="POST" class="flex items-center gap-3">
+				<form method="POST" class="flex w-full sm:w-auto items-center gap-3">
 					<input type="hidden" name="action" value="set_leader" />
-					<select name="leaderId" class="px-4 py-3 rounded-2xl border border-gray-100 bg-gray-50 text-sm">
+					<select name="leaderId" class="flex-1 px-4 py-3 rounded-2xl border border-gray-100 bg-gray-50 text-sm appearance-none truncate">
 						<option value="">Selecione um usuário...</option>
 						{[...cell.memberships.map(m => m.user), ...availableUsers].map(u => (
 							<option value={u.id} selected={cell.leader?.id === u.id}>{u.name} ({u.role})</option>
 						))}
 					</select>
-					<button type="submit" class="ml-2 px-4 py-3 rounded-2xl bg-brand-primary text-white text-sm">Definir</button>
+					<button type="submit" class="px-4 py-3 rounded-2xl bg-brand-primary text-white text-sm shrink-0">Definir</button>
 				</form>
 			</div>
 		</section>

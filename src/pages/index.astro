@@ -1,0 +1,158 @@
+---
+import AppLayout from '../layouts/AppLayout.astro';
+import { Calendar, Users, Megaphone, ArrowRight, UserPlus } from 'lucide-react';
+import { getSession } from 'auth-astro/server';
+
+import prisma from '../lib/prisma';
+
+const session = await getSession(Astro.request);
+if (!session) return Astro.redirect('/login');
+
+const firstName = session?.user?.name?.split(' ')[0] || 'Líder';
+const userRole = (session?.user as any)?.role || 'MEMBRO';
+const isAdmin = userRole === 'ADMIN';
+const isCoordinator = userRole === 'COORDENADOR';
+
+// 1. Buscar Aviso Ativo mais recente
+const activeNotice = await prisma.notice.findFirst({
+	where: { active: true },
+	orderBy: { createdAt: 'desc' }
+});
+
+// 2. Lógica de Próximos Encontros (Segunda a Sábado)
+const now = new Date();
+const todayDay = now.getDay(); // 0=Dom, 1=Seg...
+const isSunday = todayDay === 0;
+
+// Buscar todas as células que têm dia de encontro entre Segunda (1) e Sábado (6)
+const upcomingCells = await prisma.cell.findMany({
+	where: {
+		dayOfWeek: { gte: 1, lte: 6 }
+	},
+	orderBy: [
+		{ dayOfWeek: 'asc' },
+		{ time: 'asc' }
+	]
+});
+
+const dayNames = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+const dayShortNames = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+---
+
+<AppLayout title="Início">
+	<div class="space-y-6">
+		<!-- Header de boas vindas -->
+		<section class="flex items-start justify-between">
+			<div>
+				<h1 class="text-2xl font-bold text-brand-dark">Olá, {firstName}! 👋</h1>
+				<p class="text-sm text-gray-500 mt-1">Bem-vindo(a) ao sistema de gestão de células.</p>
+			</div>
+			<div class="bg-brand-bg px-4 py-2 rounded-full">
+				<span class="text-xs font-bold text-brand-primary uppercase tracking-wider">
+					{userRole === 'ADMIN' ? 'Administrador' : userRole === 'COORDENADOR' ? 'Coordenador' : userRole === 'LIDER' ? 'Líder' : 'Membro'}
+				</span>
+			</div>
+		</section>
+
+		<!-- Card de Aviso Dinâmico -->
+		{activeNotice && (
+			<section class="bg-gradient-to-r from-brand-primary to-brand-dark rounded-2xl p-5 text-white shadow-md relative overflow-hidden">
+				<div class="relative z-10">
+					<div class="flex items-center gap-2 text-brand-light mb-2">
+						<Megaphone size={16} />
+						<span class="text-xs font-semibold uppercase tracking-wider">Aviso da Liderança</span>
+					</div>
+					<h2 class="text-lg font-bold mb-1">{activeNotice.title}</h2>
+					<p class="text-sm text-blue-100 opacity-90 mb-4 line-clamp-2">{activeNotice.content}</p>
+					<a href={`/avisos/${activeNotice.id}`} class="inline-block bg-white text-brand-primary text-sm font-semibold py-2 px-4 rounded-lg shadow hover:bg-gray-50 transition-colors">
+						Ver Detalhes
+					</a>
+				</div>
+				<div class="absolute -right-6 -bottom-6 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl"></div>
+			</section>
+		)}
+
+		<!-- Quick Actions / Cards -->
+		<section class={`grid gap-4 ${isAdmin ? 'grid-cols-1 sm:grid-cols-3' : 'grid-cols-2'}`}>
+			<a href="/celulas" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 hover:border-brand-light transition-all flex flex-col items-center text-center gap-3">
+				<div class="w-12 h-12 rounded-full bg-blue-50 text-brand-primary flex items-center justify-center">
+					<Users size={24} />
+				</div>
+				<div>
+					<h3 class="font-semibold text-brand-dark text-sm">Células</h3>
+					<p class="text-[10px] text-gray-400 mt-0.5">Gerenciar unidades</p>
+				</div>
+			</a>
+
+			<a href="/presenca" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 hover:border-brand-light transition-all flex flex-col items-center text-center gap-3">
+				<div class="w-12 h-12 rounded-full bg-amber-50 text-brand-accent flex items-center justify-center">
+					<Calendar size={24} />
+				</div>
+				<div>
+					<h3 class="font-semibold text-brand-dark text-sm">Encontros</h3>
+					<p class="text-[10px] text-gray-400 mt-0.5">Lançar Presença</p>
+				</div>
+			</a>
+
+			{isAdmin && (
+				<a href="/membros" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 hover:border-brand-light transition-all flex flex-col items-center text-center gap-3">
+					<div class="w-12 h-12 rounded-full bg-red-50 text-red-500 flex items-center justify-center">
+						<UserPlus size={24} />
+					</div>
+					<div>
+						<h3 class="font-semibold text-brand-dark text-sm">Membros</h3>
+						<p class="text-[10px] text-gray-400 mt-0.5">Gerenciar usuários</p>
+					</div>
+				</a>
+			)}
+
+			{(isAdmin || isCoordinator) && (
+				<a href="/relatorios/avisos" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 hover:border-brand-light transition-all flex flex-col items-center text-center gap-3">
+					<div class="w-12 h-12 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center">
+						<Megaphone size={24} />
+					</div>
+					<div>
+						<h3 class="font-semibold text-brand-dark text-sm">Avisos</h3>
+						<p class="text-[10px] text-gray-400 mt-0.5">Gestão de mural</p>
+					</div>
+				</a>
+			)}
+		</section>
+
+		<!-- Resumo / Agenda da Semana -->
+		<section class="space-y-4">
+			<div class="flex items-center justify-between mb-2">
+				<h3 class="font-bold text-brand-dark">Agenda da Semana {isSunday ? '(Próxima)' : '(Atual)'}</h3>
+				<span class="text-[10px] text-gray-400 font-bold uppercase">Segunda a Sábado</span>
+			</div>
+			
+			<div class="space-y-3">
+				{upcomingCells.length === 0 ? (
+					<div class="text-center py-8 bg-gray-50 rounded-3xl border border-dashed border-gray-200">
+						<p class="text-xs text-gray-400">Nenhuma célula com encontro configurado esta semana.</p>
+					</div>
+				) : (
+					upcomingCells.map(cell => (
+						<a href={`/celulas/${cell.id}`} class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center justify-between hover:border-brand-light transition-colors group">
+							<div class="flex items-center gap-4">
+								<div class="bg-brand-bg rounded-xl p-2 text-center min-w-[55px]">
+									<span class="block text-[9px] text-gray-500 uppercase font-bold tracking-wider">{dayShortNames[cell.dayOfWeek || 0]}</span>
+									<span class="block text-xs font-black text-brand-primary uppercase">{dayNames[cell.dayOfWeek || 0].slice(0,3)}</span>
+								</div>
+								<div>
+									<h4 class="font-bold text-sm text-brand-dark group-hover:text-brand-primary transition-colors">{cell.name}</h4>
+									<p class="text-xs text-gray-500 mt-0.5">{cell.time} • {cell.address || 'Local a definir'}</p>
+								</div>
+							</div>
+							<div class="w-8 h-8 rounded-full bg-gray-50 text-gray-300 group-hover:bg-brand-bg group-hover:text-brand-primary flex items-center justify-center transition-all">
+								<ArrowRight size={16} />
+							</div>
+						</a>
+					))
+				)}
+			</div>
+		</section>
+	</div>
+</AppLayout>
+	</div>
+</AppLayout>

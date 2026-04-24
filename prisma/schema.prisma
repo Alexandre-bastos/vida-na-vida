@@ -1,0 +1,189 @@
+// schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// 1. RBAC (Role Based Access Control) com 5 níveis
+enum Role {
+  ADMIN
+  COORDENADOR
+  LIDER
+  LIDER_TREINAMENTO
+  MEMBRO
+}
+
+// Modelos do Auth.js
+model Account {
+  id                String  @id @default(uuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model User {
+  id            String    @id @default(uuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?   // Compatibilidade com Auth.js (Substitui avatarUrl)
+  
+  // Custom fields Vida na Vida
+  password      String?
+  role          Role      @default(MEMBRO)
+  active        Boolean   @default(true)
+  phone         String?
+  birthDate     DateTime?
+  gender        String?
+  city          String?
+  neighborhood  String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+
+  // Célula que o usuário lidera atualmente
+  ledCell   Cell?    @relation("CurrentCellLeader")
+
+  // Histórico de passagem pelas células
+  cellHistory CellMembership[]
+
+  presences Presence[]
+  invitedVisitors Visitor[] @relation("VisitorInviter")
+}
+
+// 2. Célula
+model Cell {
+  id          String   @id @default(uuid())
+  name        String
+  address     String?
+  neighborhood String?
+  dayOfWeek   Int?     // 0 = Domingo, 1 = Segunda, etc.
+  time        String?  // Ex: "19:30"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // 1 Líder Atual
+  leaderId    String?  @unique
+  leader      User?    @relation("CurrentCellLeader", fields: [leaderId], references: [id])
+
+  // Histórico de membros da célula
+  memberships CellMembership[]
+
+  meetings    Meeting[]
+  visitors    Visitor[]
+}
+
+// 3. Histórico e Vínculo de Células
+model CellMembership {
+  id        String    @id @default(uuid())
+  startDate DateTime  @default(now())
+  endDate   DateTime? // null = ainda está ativo nesta célula
+
+  roleAtTime Role     @default(MEMBRO)
+
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  cellId    String
+  cell      Cell      @relation(fields: [cellId], references: [id], onDelete: Cascade)
+}
+
+// 4. Encontros
+model Meeting {
+  id          String   @id @default(uuid())
+  date        DateTime
+  topic       String?
+  report      String?  // Relatório do encontro
+  photoUrl    String?  // Foto do encontro
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  cellId      String
+  cell        Cell     @relation(fields: [cellId], references: [id], onDelete: Cascade)
+
+  presences   Presence[]
+  visitors    Visitor[]
+}
+
+// 5. Lista de Presença (Observações por membro)
+model Presence {
+  id          String   @id @default(uuid())
+  isPresent   Boolean  @default(true) // true = Presente, false = Faltou
+  observations String? // Observações por membro
+
+  meetingId   String
+  meeting     Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([meetingId, userId])
+}
+
+// 6. Visitantes
+model Visitor {
+  id          String   @id @default(uuid())
+  name        String
+  phone       String?
+  observations String? // Observações do visitante
+  createdAt   DateTime @default(now())
+
+  // Quem convidou
+  invitedById String?
+  invitedBy   User?    @relation("VisitorInviter", fields: [invitedById], references: [id], onDelete: SetNull)
+
+  // Visitante vinculado a uma célula em geral
+  cellId      String?
+  cell        Cell?    @relation(fields: [cellId], references: [id], onDelete: SetNull)
+
+  // Visitante registrado em um encontro específico
+  meetingId   String?
+  meeting     Meeting? @relation(fields: [meetingId], references: [id], onDelete: SetNull)
+}
+
+// 7. Mural da Página Inicial
+model Notice {
+  id          String   @id @default(uuid())
+  title       String
+  content     String
+  imageUrl    String?  // Fotos e notícias
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

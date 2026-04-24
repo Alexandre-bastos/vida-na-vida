@@ -5,7 +5,7 @@ export const onRequest = defineMiddleware(async ({ request, locals }, next) => {
   const url = new URL(request.url);
 
   // Rotas públicas — não precisam de autenticação
-  const publicPaths = ["/api/auth", "/login", "/definir-senha", "/images", "/styles", "/favicon.ico", "/public", "/_astro", "/uploads"];
+  const publicPaths = ["/api/auth", "/login", "/definir-senha", "/manual", "/images", "/styles", "/favicon.ico", "/public", "/_astro", "/uploads"];
   if (publicPaths.some((p) => url.pathname.startsWith(p))) {
     return next();
   }

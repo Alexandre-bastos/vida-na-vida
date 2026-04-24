@@ -39,12 +39,17 @@ if (Astro.request.method === 'POST') {
   let image = user.image;
 
   if (imageFile && (imageFile as any).size > 0) {
+    // Nota: O upload local não funciona na Vercel (sistema de arquivos read-only).
+    // Para funcionar em produção, seria necessário usar Vercel Blob ou Cloudinary.
+    /*
     const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
     if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
     const filename = `profile-${userId}-${Date.now()}-${(imageFile as any).name}`;
     const buffer = await (imageFile as any).arrayBuffer();
     fs.writeFileSync(path.join(uploadsDir, filename), Buffer.from(buffer));
     image = `/uploads/${filename}`;
+    */
+    console.log("Upload de imagem ignorado (Vercel read-only environment)");
   }
 
   await prisma.user.update({

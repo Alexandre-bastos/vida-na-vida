@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Manual do Usuário — Vida na Vida</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    :root {
+      --primary: #5270ac;
+      --dark: #2c3c5c;
+      --accent: #c9a84c;
+      --bg: #f8f9fc;
+      --gray: #6b7280;
+      --light-gray: #e5e7eb;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: #333;
+      line-height: 1.7;
+      font-size: 11pt;
+      background: white;
+    }
+
+    @page {
+      size: A4;
+      margin: 20mm 18mm 25mm 18mm;
+    }
+
+    /* Cover Page */
+    .cover {
+      page-break-after: always;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+      background: linear-gradient(135deg, var(--bg) 0%, #eef1f8 100%);
+    }
+    .cover-logo {
+      width: 120px;
+      height: 120px;
+      background: var(--primary);
+      border-radius: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 48px;
+      font-weight: 800;
+      margin-bottom: 40px;
+      box-shadow: 0 20px 60px rgba(82, 112, 172, 0.3);
+    }
+    .cover h1 {
+      font-size: 32pt;
+      font-weight: 800;
+      color: var(--dark);
+      margin-bottom: 8px;
+    }
+    .cover h2 {
+      font-size: 14pt;
+      font-weight: 500;
+      color: var(--gray);
+      margin-bottom: 40px;
+    }
+    .cover .version {
+      font-size: 10pt;
+      color: var(--gray);
+      border-top: 2px solid var(--light-gray);
+      padding-top: 20px;
+      margin-top: auto;
+      margin-bottom: 60px;
+    }
+
+    /* Content */
+    .content {
+      max-width: 100%;
+      padding: 0;
+    }
+
+    h1 {
+      font-size: 20pt;
+      font-weight: 800;
+      color: var(--dark);
+      margin-top: 36px;
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 3px solid var(--primary);
+      page-break-after: avoid;
+    }
+
+    h2 {
+      font-size: 14pt;
+      font-weight: 700;
+      color: var(--primary);
+      margin-top: 28px;
+      margin-bottom: 10px;
+      page-break-after: avoid;
+    }
+
+    h3 {
+      font-size: 12pt;
+      font-weight: 700;
+      color: var(--dark);
+      margin-top: 20px;
+      margin-bottom: 8px;
+      page-break-after: avoid;
+    }
+
+    p {
+      margin-bottom: 10px;
+      text-align: justify;
+    }
+
+    ul, ol {
+      margin-bottom: 12px;
+      padding-left: 24px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    strong {
+      font-weight: 700;
+      color: var(--dark);
+    }
+
+    code {
+      background: #f0f2f7;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 10pt;
+      font-family: 'Courier New', monospace;
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 20px;
+      font-size: 10pt;
+      page-break-inside: avoid;
+    }
+
+    thead th {
+      background: var(--dark);
+      color: white;
+      font-weight: 700;
+      text-align: left;
+      padding: 10px 12px;
+      font-size: 9pt;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    tbody td {
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--light-gray);
+      vertical-align: top;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #f8f9fc;
+    }
+
+    tbody tr:hover {
+      background: #eef1f8;
+    }
+
+    /* Centered cells for checkmarks */
+    .permissions td:not(:first-child),
+    .permissions th:not(:first-child) {
+      text-align: center;
+      width: 70px;
+    }
+
+    .check { color: #10b981; font-weight: 700; }
+    .cross { color: #ef4444; font-weight: 700; }
+
+    /* Info boxes */
+    .info-box {
+      background: #eff6ff;
+      border-left: 4px solid var(--primary);
+      padding: 12px 16px;
+      margin: 14px 0;
+      border-radius: 0 8px 8px 0;
+      font-size: 10pt;
+    }
+
+    .warning-box {
+      background: #fef9ee;
+      border-left: 4px solid var(--accent);
+      padding: 12px 16px;
+      margin: 14px 0;
+      border-radius: 0 8px 8px 0;
+      font-size: 10pt;
+    }
+
+    /* Section divider */
+    hr {
+      border: none;
+      border-top: 1px solid var(--light-gray);
+      margin: 24px 0;
+    }
+
+    /* Steps */
+    .steps {
+      counter-reset: step;
+      list-style: none;
+      padding-left: 0;
+    }
+    .steps li {
+      counter-increment: step;
+      padding-left: 36px;
+      position: relative;
+      margin-bottom: 8px;
+    }
+    .steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 1px;
+      width: 24px;
+      height: 24px;
+      background: var(--primary);
+      color: white;
+      border-radius: 50%;
+      font-size: 9pt;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      text-align: center;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      margin-top: 60px;
+      padding-top: 20px;
+      border-top: 2px solid var(--light-gray);
+      color: var(--gray);
+      font-size: 10pt;
+    }
+
+    .page-break { page-break-before: always; }
+
+    /* TOC */
+    .toc {
+      page-break-after: always;
+    }
+    .toc h1 {
+      border-bottom-color: var(--accent);
+    }
+    .toc ul {
+      list-style: none;
+      padding: 0;
+    }
+    .toc > ul > li {
+      margin-bottom: 6px;
+      font-weight: 700;
+      font-size: 11pt;
+      color: var(--dark);
+      padding: 6px 0;
+      border-bottom: 1px dotted var(--light-gray);
+    }
+    .toc > ul > li > ul {
+      margin-top: 4px;
+      padding-left: 20px;
+    }
+    .toc > ul > li > ul > li {
+      font-weight: 500;
+      font-size: 10pt;
+      color: var(--gray);
+      border: none;
+      margin-bottom: 2px;
+      padding: 2px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CAPA -->
+  <div class="cover">
+    <div class="cover-logo">VV</div>
+    <h1>Manual do Usuário</h1>
+    <h2>Sistema de Gestão de Células</h2>
+    <p style="color: var(--gray); font-size: 11pt;">Comunidade Cristã Vida na Vida</p>
+    <div class="version">
+      Versão 1.0 — Abril 2026
+    </div>
+  </div>
+
+  <!-- SUMÁRIO -->
+  <div class="toc">
+    <h1>Sumário</h1>
+    <ul>
+      <li>1. Acesso ao Sistema</li>
+      <li>2. Papéis e Permissões
+        <ul>
+          <li>Tabela de papéis</li>
+          <li>Matriz de permissões</li>
+        </ul>
+      </li>
+      <li>3. Guia de Funcionalidades
+        <ul>
+          <li>3.1 Tela Inicial</li>
+          <li>3.2 Meu Perfil</li>
+          <li>3.3 Membros</li>
+          <li>3.4 Células</li>
+          <li>3.5 Registro de Presença</li>
+          <li>3.6 Relatórios</li>
+          <li>3.7 Avisos</li>
+        </ul>
+      </li>
+      <li>4. Minha Célula (Visão do Líder)</li>
+      <li>5. Dicas Importantes</li>
+    </ul>
+  </div>
+
+  <!-- CONTEÚDO -->
+  <div class="content">
+
+    <h1>1. Acesso ao Sistema</h1>
+
+    <p><strong>Endereço:</strong> <code>https://vida-na-vida.vercel.app</code></p>
+
+    <h3>Como entrar</h3>
+    <ol class="steps">
+      <li>Abra o endereço acima no navegador do celular ou computador.</li>
+      <li>Informe seu <strong>e-mail</strong> e <strong>senha</strong>.</li>
+      <li>Toque em <strong>Entrar no Sistema</strong>.</li>
+    </ol>
+
+    <div class="warning-box">
+      <strong>Primeiro acesso?</strong> A senha padrão é <code>vidanavida</code>. Troque-a imediatamente pelo menu <strong>Perfil</strong>.
+    </div>
+
+    <hr>
+
+    <h1>2. Papéis e Permissões</h1>
+
+    <p>O sistema possui 5 tipos de usuário, cada um com permissões diferentes:</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Papel</th>
+          <th>Quem é</th>
+          <th>O que pode fazer</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Administrador</strong></td>
+          <td>Gestor geral do sistema</td>
+          <td>Acesso total: cria células, membros e coordenadores. Visualiza todos os relatórios. Não é vinculado a células.</td>
+        </tr>
+        <tr>
+          <td><strong>Coordenador</strong></td>
+          <td>Supervisiona várias células</td>
+          <td>Gerencia células e membros. Acessa relatórios gerais. Pode criar e editar avisos.</td>
+        </tr>
+        <tr>
+          <td><strong>Líder</strong></td>
+          <td>Responsável por uma célula</td>
+          <td>Registra presenças, adiciona membros à sua célula e acompanha o engajamento do grupo.</td>
+        </tr>
+        <tr>
+          <td><strong>Líder em Treinamento</strong></td>
+          <td>Futuro líder em preparação</td>
+          <td>Mesmas funções do Líder, porém só pode cadastrar novos membros com cargo "Membro".</td>
+        </tr>
+        <tr>
+          <td><strong>Membro</strong></td>
+          <td>Participante de uma célula</td>
+          <td>Acesso básico: visualiza sua célula, registra presença quando solicitado e edita seu perfil.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Matriz de Permissões</h2>
+
+    <table class="permissions">
+      <thead>
+        <tr>
+          <th>Funcionalidade</th>
+          <th>Admin</th>
+          <th>Coord.</th>
+          <th>Líder</th>
+          <th>L. Trein.</th>
+          <th>Membro</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Ver tela inicial</td>
+          <td class="check">✔</td>
+          <td class="check">✔</td>
+          <td class="check">✔</td>
+          <td class="check">✔</td>
+          <td class="check">✔</td>
+        </tr>
+        <tr>
+          <td>Editar próprio perfil</td>
+          <td class="check">✔</td>
+          <td class="check">✔</td>
+          <td class="check">✔</td>
+          <td class="check">✔</td>
+          <td class="check">✔</td>
+        </tr>
+        <tr>
+          <td>Ver todas as células</td>
+          <td class="check">✔</td>
+          <td class="check">✔</td>
+          <td class="cross">✘</td>
+          <td class="cross">✘</td>
+          <td class="cross">✘</td>
+        </tr>
+        <tr>
+          <td>Ver minha célula</td>
+          <td>—</td>
+          <td>—</td>
+          <td class="check">✔</td>
+          <td class="check">✔</td>
+          <td class="check">✔</td>
+        </tr>
+        <tr>
+          <td>Criar células</td>
+          <td class="check">✔</td>
+          <td class="check">✔</td>
+          <td class="cross">✘</td>
+          <td class="cross">✘</td>
+          <td class="cross">✘</td>
+        </tr>
+        <tr>
+          <td>Gerenciar membros de célula</td>
+          <td class="check">✔</td>
+          <td class="check">✔</td>
+          <td class="check">✔*</td>
+          <td class="check">✔*</td>
+          <td class="cross">✘</td>
+        </tr>
+        <tr>
+          <td>Cadastrar novos membros</td>
+          <td class="check">✔</td>
+          <td class="check">✔</td>
+          <td class="check">✔</td>
+          <td class="check">✔**</td>
+          <td class="cross">✘</td>
+        </tr>
+        <tr>
+          <td>Definir líder de célula</td>
+          <td class="check">✔</td>
+          <td class="check">✔</td>
+          <td class="cross">✘</td>
+          <td class="cross">✘</td>
+          <td class="cross">✘</td>
+        </tr>
+        <tr>
+          <td>Registrar presença</td>
+          <td class="check">✔</td>
+          <td class="check">✔</td>
+          <td class="check">✔</td>
+          <td class="check">✔</td>
+          <td class="cross">✘</td>
+        </tr>
+        <tr>
+          <td>Acessar relatórios</td>
+          <td class="check">✔</td>
+          <td class="check">✔</td>
+          <td class="cross">✘</td>
+          <td class="cross">✘</td>
+          <td class="cross">✘</td>
+        </tr>
+        <tr>
+          <td>Criar e editar avisos</td>
+          <td class="check">✔</td>
+          <td class="check">✔</td>
+          <td class="cross">✘</td>
+          <td class="cross">✘</td>
+          <td class="cross">✘</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="font-size: 9pt; color: var(--gray);">
+      * Apenas na própria célula. &nbsp;&nbsp; ** Só pode criar usuários com cargo "Membro".
+    </p>
+
+    <div class="page-break"></div>
+
+    <h1>3. Guia de Funcionalidades</h1>
+
+    <h2>3.1 Tela Inicial</h2>
+    <p>Ao entrar, você verá um painel com:</p>
+    <ul>
+      <li><strong>Avisos ativos</strong> publicados pela coordenação.</li>
+      <li><strong>Atalhos rápidos</strong> para as principais funções.</li>
+      <li><strong>Resumo da sua célula</strong> (se vinculado a alguma).</li>
+    </ul>
+
+    <hr>
+
+    <h2>3.2 Meu Perfil</h2>
+    <p><strong>Caminho:</strong> Menu inferior → <strong>Perfil</strong></p>
+    <p>Nesta tela você pode:</p>
+    <ul>
+      <li>Alterar seu <strong>nome</strong>, <strong>sexo</strong>, <strong>cidade</strong> e <strong>bairro</strong>.</li>
+      <li>Enviar ou trocar sua <strong>foto de perfil</strong>.</li>
+      <li><strong>Trocar sua senha</strong> (mínimo 6 caracteres).</li>
+    </ul>
+
+    <div class="warning-box">
+      <strong>Importante:</strong> Oriente todos os novos membros a trocarem a senha padrão no primeiro acesso.
+    </div>
+
+    <hr>
+
+    <h2>3.3 Membros</h2>
+    <p><strong>Caminho:</strong> Menu inferior → <strong>Membros</strong><br>
+    <strong>Disponível para:</strong> Administrador, Coordenador, Líder</p>
+
+    <h3>Cadastrar um novo membro</h3>
+    <ol class="steps">
+      <li>Toque em <strong>+ Novo Membro</strong>.</li>
+      <li>Preencha nome, e-mail, telefone e dados pessoais.</li>
+      <li>Escolha o <strong>cargo</strong> adequado.</li>
+      <li>Toque em <strong>Salvar Membro</strong>.</li>
+    </ol>
+
+    <div class="info-box">
+      O membro será criado com a senha padrão <code>vidanavida</code>. Informe ao usuário para trocá-la no primeiro acesso.
+    </div>
+
+    <h3>Editar um membro</h3>
+    <ol class="steps">
+      <li>Na lista de membros, toque sobre o nome desejado.</li>
+      <li>Altere as informações necessárias.</li>
+      <li>Toque em <strong>Salvar Alterações</strong>.</li>
+    </ol>
+
+    <hr>
+
+    <h2>3.4 Células</h2>
+    <p><strong>Caminho:</strong> Menu inferior → <strong>Células</strong><br>
+    <strong>Disponível para:</strong> Administrador, Coordenador</p>
+
+    <h3>Criar uma nova célula</h3>
+    <ol class="steps">
+      <li>Toque em <strong>+ Nova Célula</strong>.</li>
+      <li>Preencha: nome, endereço, bairro, dia da semana e horário.</li>
+      <li>Toque em <strong>Salvar Célula</strong>.</li>
+    </ol>
+
+    <h3>Gerenciar uma célula existente</h3>
+    <p>Ao tocar em uma célula, você acessa a tela de detalhes:</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Ação</th>
+          <th>Como fazer</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Adicionar membro</strong></td>
+          <td>Selecione um usuário no dropdown e toque em <strong>Adicionar</strong>.</td>
+        </tr>
+        <tr>
+          <td><strong>Remover membro</strong></td>
+          <td>Toque em <strong>Remover</strong> ao lado do nome do membro.</td>
+        </tr>
+        <tr>
+          <td><strong>Definir líder</strong></td>
+          <td>Na seção "Definir Líder", escolha o responsável e toque em <strong>Definir</strong>.</td>
+        </tr>
+        <tr>
+          <td><strong>Editar informações</strong></td>
+          <td>Toque no ícone de lápis no canto superior direito.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="info-box">
+      <strong>Nota:</strong> Administradores não aparecem na lista de membros disponíveis, pois gerenciam o sistema como um todo.
+    </div>
+
+    <hr>
+
+    <h2>3.5 Registro de Presença</h2>
+    <p><strong>Caminho:</strong> Menu inferior → <strong>Presença</strong><br>
+    <strong>Disponível para:</strong> Líder, Líder em Treinamento</p>
+
+    <h3>Registrar um encontro</h3>
+    <ol class="steps">
+      <li>Toque em <strong>Nova Presença</strong>.</li>
+      <li>Selecione a <strong>célula</strong> e a <strong>data</strong> do encontro.</li>
+      <li>Marque os membros que estiveram <strong>presentes</strong>.</li>
+      <li>(Opcional) Adicione uma <strong>foto do encontro</strong> e um breve <strong>relatório</strong>.</li>
+      <li>Toque em <strong>Salvar</strong>.</li>
+    </ol>
+
+    <div class="page-break"></div>
+
+    <h2>3.6 Relatórios</h2>
+    <p><strong>Caminho:</strong> Menu inferior → <strong>Relatórios</strong><br>
+    <strong>Disponível para:</strong> Administrador, Coordenador</p>
+
+    <p>Os relatórios oferecem uma visão estratégica, dividida em três abas:</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Aba</th>
+          <th>O que mostra</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Board Geral</strong></td>
+          <td>Total de células e membros, novos cadastros, alertas de inatividade, distribuição por bairro.</td>
+        </tr>
+        <tr>
+          <td><strong>Engajamento</strong></td>
+          <td>Ranking de frequência por célula, média de presentes, histórico de encontros.</td>
+        </tr>
+        <tr>
+          <td><strong>Perfil de Membros</strong></td>
+          <td>Distribuição por sexo e faixa etária, lista de membros ausentes no período.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Filtros disponíveis</h3>
+    <p>No topo dos relatórios, você pode filtrar por:</p>
+    <ul>
+      <li><strong>Data inicial</strong> e <strong>data final</strong>.</li>
+      <li><strong>Célula específica</strong> (ou visualizar todas).</li>
+    </ul>
+    <p>Toque em <strong>Filtrar</strong> para aplicar e em <strong>Limpar</strong> para resetar.</p>
+
+    <hr>
+
+    <h2>3.7 Avisos</h2>
+    <p><strong>Caminho:</strong> Relatórios → seção Avisos<br>
+    <strong>Disponível para:</strong> Administrador, Coordenador</p>
+
+    <h3>Criar um aviso</h3>
+    <ol class="steps">
+      <li>Acesse a seção de Avisos e toque em <strong>Novo Aviso</strong>.</li>
+      <li>Preencha <strong>título</strong> e <strong>conteúdo</strong>.</li>
+      <li>(Opcional) Anexe uma <strong>imagem</strong>.</li>
+      <li>Marque se o aviso deve ficar <strong>ativo imediatamente</strong>.</li>
+      <li>Toque em <strong>Publicar Aviso</strong>.</li>
+    </ol>
+
+    <div class="info-box">
+      Os avisos ativos são exibidos na tela inicial de <strong>todos</strong> os usuários do sistema.
+    </div>
+
+    <hr>
+
+    <h1>4. Minha Célula (Visão do Líder)</h1>
+
+    <p><strong>Caminho:</strong> Menu inferior → <strong>Minha Célula</strong><br>
+    <strong>Disponível para:</strong> Líder, Líder em Treinamento</p>
+
+    <p>Líderes não veem a lista completa de células — apenas a <strong>sua própria célula</strong> com:</p>
+    <ul>
+      <li>Lista dos membros vinculados.</li>
+      <li>Acesso rápido para registrar presença.</li>
+      <li>Possibilidade de adicionar novos membros.</li>
+    </ul>
+
+    <hr>
+
+    <h1>5. Dicas Importantes</h1>
+
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 30px">#</th>
+          <th>Dica</th>
+          <th>Por quê</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>1</strong></td>
+          <td><strong>Troque a senha padrão</strong></td>
+          <td>A senha <code>vidanavida</code> é temporária. Oriente cada novo membro a trocá-la em Perfil.</td>
+        </tr>
+        <tr>
+          <td><strong>2</strong></td>
+          <td><strong>Registre presenças semanalmente</strong></td>
+          <td>Os relatórios dependem desses registros para gerar indicadores precisos.</td>
+        </tr>
+        <tr>
+          <td><strong>3</strong></td>
+          <td><strong>Use os filtros de relatório</strong></td>
+          <td>Filtre por período e célula para obter insights direcionados.</td>
+        </tr>
+        <tr>
+          <td><strong>4</strong></td>
+          <td><strong>Mantenha os dados atualizados</strong></td>
+          <td>Bairro, cidade e data de nascimento alimentam os gráficos de perfil.</td>
+        </tr>
+        <tr>
+          <td><strong>5</strong></td>
+          <td><strong>Adicione fotos</strong></td>
+          <td>Fotos de perfil e de encontros tornam o sistema mais visual e engajante.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="footer">
+      <p><strong>Vida na Vida</strong> — <em>Conectando pessoas, fortalecendo comunidades.</em></p>
+      <p style="margin-top: 4px; font-size: 9pt;">© 2026 Comunidade Cristã Vida na Vida. Todos os direitos reservados.</p>
+    </div>
+
+  </div>
+
+</body>
+</html>

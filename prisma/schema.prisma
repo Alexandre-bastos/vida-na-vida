@@ -38,7 +38,7 @@ model cell {
   updatedAt      DateTime         @updatedAt
   leaderId       String?          @unique(map: "Cell_leaderId_key")
   leader         user?            @relation("CurrentCellLeader", fields: [leaderId], references: [id], map: "Cell_leaderId_fkey")
-  cellmembership cellmembership[]
+  memberships    cellmembership[]
   meetings       meeting[]
   visitors       visitor[]
 }

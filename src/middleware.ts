@@ -33,3 +33,4 @@ export const onRequest = defineMiddleware(async ({ request, locals }, next) => {
 
   return next();
 });
+

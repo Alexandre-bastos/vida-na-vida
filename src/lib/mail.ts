@@ -44,3 +44,4 @@ export async function sendInviteEmail(email: string, name: string, token: string
     return { success: false, error: err };
   }
 }
+

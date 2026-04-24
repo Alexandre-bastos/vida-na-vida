@@ -83,7 +83,7 @@ if (Astro.request.method === 'POST') {
     if (action === 'add_member') {
         const userId = formData.get('userId')?.toString();
         if (userId) {
-            await prisma.cellMembership.create({
+            await prisma.cellmembership.create({
                 data: {
                     userId,
                     cellId: id!,
@@ -97,7 +97,7 @@ if (Astro.request.method === 'POST') {
 	if (action === 'remove_member') {
         const membershipId = formData.get('membershipId')?.toString();
         if (membershipId) {
-            await prisma.cellMembership.update({
+            await prisma.cellmembership.update({
                 where: { id: membershipId },
                 data: { endDate: new Date() }
             });

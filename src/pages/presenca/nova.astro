@@ -53,7 +53,7 @@ if (qMeetingId) {
 // Get members
 async function loadMembers(cellId) {
   if (!cellId) return [];
-  return await prisma.cellMembership.findMany({
+  return await prisma.cellmembership.findMany({
     where: { cellId, endDate: null },
     include: { user: true },
     orderBy: { user: { name: 'asc' } }
@@ -83,12 +83,16 @@ if (Astro.request.method === 'POST') {
   const photo = formData.get('photo') as unknown as File;
   let photoUrl = null;
   if (photo && (photo as any).size > 0) {
+    // Nota: Upload local não funciona na Vercel
+    /*
     const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
     if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
     const filename = `${Date.now()}-${(photo as any).name}`;
     const buffer = await (photo as any).arrayBuffer();
     fs.writeFileSync(path.join(uploadsDir, filename), Buffer.from(buffer));
     photoUrl = `/uploads/${filename}`;
+    */
+    console.log("Upload de foto da célula ignorado (Vercel environment)");
   }
 
   let finalMeetingId = existingMeetingId;
@@ -253,3 +257,4 @@ if (Astro.request.method === 'POST') {
   }
   </script>
 </AppLayout>
+

@@ -12,7 +12,7 @@ let success = false;
 // 1. Validar se o token e e-mail existem no banco e não expiraram
 let verification = null;
 if (token && email) {
-    verification = await prisma.verificationToken.findFirst({
+    verification = await prisma.verificationtoken.findFirst({
         where: {
             identifier: email,
             token: token,
@@ -33,7 +33,7 @@ if (Astro.request.method === 'POST') {
 
     // Re-validar token no POST
     if (!verification) {
-        verification = await prisma.verificationToken.findFirst({
+        verification = await prisma.verificationtoken.findFirst({
             where: {
                 identifier: email || '',
                 token: token || '',
@@ -58,7 +58,7 @@ if (Astro.request.method === 'POST') {
                     where: { email: email! },
                     data: { password: hashedPassword }
                 }),
-                prisma.verificationToken.delete({
+                prisma.verificationtoken.delete({
                     where: { 
                         identifier_token: {
                             identifier: email!,
@@ -164,3 +164,4 @@ const hasValidToken = !!verification || Astro.request.method === 'POST';
 		<p class="text-[10px] text-gray-400 mt-10 font-bold uppercase tracking-widest">© 2026 Vida na Vida</p>
 	</body>
 </html>
+

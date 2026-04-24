@@ -230,15 +230,15 @@ if (Astro.request.method === 'POST') {
 					<h3 class="font-bold text-sm">Definir Líder</h3>
 					<p class="text-xs text-gray-400">Escolha o líder responsável por esta célula.</p>
 				</div>
-				<form method="POST" class="flex w-full sm:w-auto items-center gap-3">
+				<form method="POST" class="flex flex-col sm:flex-row w-full sm:w-auto gap-3">
 					<input type="hidden" name="action" value="set_leader" />
-					<select name="leaderId" class="flex-1 px-4 py-3 rounded-2xl border border-gray-100 bg-gray-50 text-sm appearance-none truncate">
+					<select name="leaderId" class="w-full sm:flex-1 px-4 py-3 rounded-2xl border border-gray-100 bg-gray-50 text-sm appearance-none truncate">
 						<option value="">Selecione um usuário...</option>
 						{[...cell.memberships.map(m => m.user), ...availableUsers].map(u => (
 							<option value={u.id} selected={cell.leader?.id === u.id}>{u.name} ({u.role})</option>
 						))}
 					</select>
-					<button type="submit" class="px-4 py-3 rounded-2xl bg-brand-primary text-white text-sm shrink-0">Definir</button>
+					<button type="submit" class="w-full sm:w-auto px-6 py-3 rounded-2xl bg-brand-primary text-white text-sm font-bold shrink-0">Definir</button>
 				</form>
 			</div>
 		</section>
@@ -284,12 +284,10 @@ if (Astro.request.method === 'POST') {
 							</div>
 							
 							{canManageCell && (
-								<form method="POST" class="opacity-0 group-hover:opacity-100 transition-opacity">
+								<form method="POST" class="sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
 									<input type="hidden" name="action" value="remove_member" />
 									<input type="hidden" name="membershipId" value={membership.id} />
-									<button type="submit" class="w-8 h-8 rounded-lg bg-red-50 text-red-400 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all">
-										<Trash2 size={14} />
-									</button>
+									<button type="submit" class="text-red-400 text-xs font-bold hover:text-red-600 transition-colors">Remover</button>
 								</form>
 							)}
 						</div>

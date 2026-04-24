@@ -22,6 +22,7 @@
     "@tailwindcss/vite": "^4.2.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "@vercel/blob": "^2.3.3",
     "astro": "^6.1.8",
     "auth-astro": "^4.2.0",
     "bcryptjs": "^3.0.3",

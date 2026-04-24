@@ -27,6 +27,7 @@ const user = await prisma.user.findUnique({
 if (!user) return Astro.redirect('/login');
 
 let success = false;
+let error = '';
 
 if (Astro.request.method === 'POST') {
   const formData = await Astro.request.formData();
@@ -40,17 +41,16 @@ if (Astro.request.method === 'POST') {
   let image = user.image;
 
   if (imageFile && (imageFile as any).size > 0) {
-    // Nota: O upload local não funciona na Vercel (sistema de arquivos read-only).
-    // Para funcionar em produção, seria necessário usar Vercel Blob ou Cloudinary.
-    /*
-    const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-    if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
-    const filename = `profile-${userId}-${Date.now()}-${(imageFile as any).name}`;
-    const buffer = await (imageFile as any).arrayBuffer();
-    fs.writeFileSync(path.join(uploadsDir, filename), Buffer.from(buffer));
-    image = `/uploads/${filename}`;
-    */
-    console.log("Upload de imagem ignorado (Vercel read-only environment)");
+    try {
+      const { put } = await import('@vercel/blob');
+      const blob = await put(`profiles/${userId}-${Date.now()}-${(imageFile as any).name}`, imageFile, {
+        access: 'public',
+      });
+      image = blob.url;
+    } catch (err) {
+      console.error("Erro ao fazer upload para o Vercel Blob:", err);
+      error = "Erro ao fazer upload da imagem. O Vercel Blob não está configurado corretamente.";
+    }
   }
 
   const newPassword = formData.get('newPassword')?.toString();
@@ -92,6 +92,12 @@ const isSuccess = Astro.url.searchParams.get('success') === '1';
       <div class="bg-green-50 border border-green-100 text-green-800 p-4 rounded-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
         <CheckCircle size={20} />
         <span class="text-sm font-bold">Perfil atualizado com sucesso!</span>
+      </div>
+    )}
+
+    {error && (
+      <div class="bg-red-50 border border-red-100 text-red-800 p-4 rounded-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
+        <span class="text-sm font-bold">{error}</span>
       </div>
     )}
 

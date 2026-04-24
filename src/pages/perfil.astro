@@ -3,8 +3,6 @@ import AppLayout from '../layouts/AppLayout.astro';
 import { getSession } from 'auth-astro/server';
 import prisma from '../lib/prisma';
 import { Camera, Save, MapPin, User as UserIcon, CheckCircle, Shield } from 'lucide-react';
-import fs from 'fs';
-import path from 'path';
 import bcrypt from 'bcryptjs';
 
 const session = await getSession(Astro.request);
@@ -43,7 +41,8 @@ if (Astro.request.method === 'POST') {
   if (imageFile && (imageFile as any).size > 0) {
     try {
       const { put } = await import('@vercel/blob');
-      const blob = await put(`profiles/${userId}-${Date.now()}-${(imageFile as any).name}`, imageFile, {
+      const buffer = await (imageFile as any).arrayBuffer();
+      const blob = await put(`profiles/${userId}-${Date.now()}-${(imageFile as any).name}`, buffer, {
         access: 'public',
       });
       image = blob.url;
@@ -56,26 +55,31 @@ if (Astro.request.method === 'POST') {
   const newPassword = formData.get('newPassword')?.toString();
   const confirmPassword = formData.get('confirmPassword')?.toString();
   
-  let updateData: any = {
-    name: name || user.name,
-    gender: gender || user.gender,
-    city: city || user.city,
-    neighborhood: neighborhood || user.neighborhood,
-    image
-  };
+  if (!error) {
+    let updateData: any = {
+      name: name || user.name,
+      gender: gender || user.gender,
+      city: city || user.city,
+      neighborhood: neighborhood || user.neighborhood,
+      image
+    };
 
-  if (newPassword && newPassword === confirmPassword && newPassword.length >= 6) {
-    updateData.password = bcrypt.hashSync(newPassword, 10);
+    if (newPassword && newPassword === confirmPassword && newPassword.length >= 6) {
+      updateData.password = bcrypt.hashSync(newPassword, 10);
+    }
+
+    try {
+      await prisma.user.update({
+        where: { id: userId },
+        data: updateData
+      });
+      success = true;
+      return Astro.redirect('/perfil?success=1');
+    } catch (dbError) {
+      console.error("Erro ao salvar no banco:", dbError);
+      error = "Erro ao salvar as informações no banco de dados.";
+    }
   }
-
-  await prisma.user.update({
-    where: { id: userId },
-    data: updateData
-  });
-  
-  success = true;
-  // Recarregar dados para exibição
-  return Astro.redirect('/perfil?success=1');
 }
 
 const isSuccess = Astro.url.searchParams.get('success') === '1';

@@ -3,8 +3,6 @@ import AppLayout from '../../layouts/AppLayout.astro';
 import { ChevronLeft, Camera } from 'lucide-react';
 import { getSession } from 'auth-astro/server';
 import prisma from '../../lib/prisma';
-import fs from 'fs';
-import path from 'path';
 
 let session = await getSession(Astro.request);
 if (!session?.user) {
@@ -83,16 +81,17 @@ if (Astro.request.method === 'POST') {
   const photo = formData.get('photo') as unknown as File;
   let photoUrl = null;
   if (photo && (photo as any).size > 0) {
-    // Nota: Upload local não funciona na Vercel
-    /*
-    const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-    if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
-    const filename = `${Date.now()}-${(photo as any).name}`;
-    const buffer = await (photo as any).arrayBuffer();
-    fs.writeFileSync(path.join(uploadsDir, filename), Buffer.from(buffer));
-    photoUrl = `/uploads/${filename}`;
-    */
-    console.log("Upload de foto da célula ignorado (Vercel environment)");
+    try {
+      const { put } = await import('@vercel/blob');
+      const buffer = await (photo as any).arrayBuffer();
+      const blob = await put(`meetings/${Date.now()}-${(photo as any).name}`, buffer, {
+        access: 'public',
+      });
+      photoUrl = blob.url;
+    } catch (err) {
+      console.error("Erro ao fazer upload da foto do encontro:", err);
+      // Aqui poderíamos definir um erro, mas para não impedir o envio da presença, apenas logamos.
+    }
   }
 
   let finalMeetingId = existingMeetingId;

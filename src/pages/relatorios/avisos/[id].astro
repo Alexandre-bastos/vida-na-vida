@@ -3,8 +3,7 @@ import ReportLayout from '../../../layouts/ReportLayout.astro';
 import { getSession } from 'auth-astro/server';
 import prisma from '../../../lib/prisma';
 import { ChevronLeft, Save, Camera } from 'lucide-react';
-import fs from 'fs';
-import path from 'path';
+
 
 const session = await getSession(Astro.request);
 if (!session) return Astro.redirect('/login');
@@ -30,12 +29,16 @@ if (Astro.request.method === 'POST') {
   let imageUrl = notice.imageUrl;
   
   if (image && (image as any).size > 0) {
-    const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
-    if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
-    const filename = `${Date.now()}-${(image as any).name}`;
-    const buffer = await (image as any).arrayBuffer();
-    fs.writeFileSync(path.join(uploadsDir, filename), Buffer.from(buffer));
-    imageUrl = `/uploads/${filename}`;
+    try {
+      const { put } = await import('@vercel/blob');
+      const buffer = await (image as any).arrayBuffer();
+      const blob = await put(`avisos/${Date.now()}-${(image as any).name}`, buffer, {
+        access: 'public',
+      });
+      imageUrl = blob.url;
+    } catch (err) {
+      console.error("Erro ao fazer upload da imagem do aviso:", err);
+    }
   }
 
   if (title && content) {

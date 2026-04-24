@@ -64,8 +64,10 @@ if (!canViewCell) {
 }
 
 // Buscar todos os usuários que NÃO estão em nenhuma célula ativa para adicionar como membros
+// Administradores não devem aparecer na lista
 const availableUsers = await prisma.user.findMany({
   where: {
+    role: { not: 'ADMIN' },
     cellHistory: {
       none: { endDate: null }
     }

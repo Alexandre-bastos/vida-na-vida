@@ -4,6 +4,7 @@ import { ChevronLeft, Save, User, Mail, Phone, Shield, Calendar, Send } from 'lu
 import { getSession } from 'auth-astro/server';
 import prisma from '../../lib/prisma';
 import { sendInviteEmail } from '../../lib/mail';
+import bcrypt from 'bcryptjs';
 
 
 const session = await getSession(Astro.request);
@@ -61,6 +62,7 @@ if (Astro.request.method === 'POST') {
           gender,
           city,
           neighborhood,
+          password: bcrypt.hashSync('vidanavida', 10),
           updatedAt: new Date(),
         }
       });
@@ -213,7 +215,8 @@ if (Astro.request.method === 'POST') {
 				</div>
 
 				<p class="text-[11px] text-gray-500 bg-blue-50 p-3 rounded-xl border border-blue-100 mb-4">
-					<span class="font-bold">Nota:</span> Um e-mail de convite será enviado para o membro definir sua própria senha de acesso.
+					<span class="font-bold">Acesso:</span> Um e-mail de convite será enviado. A senha padrão do usuário será <strong>vidanavida</strong>.<br />
+          Oriente-o a alterá-la logo no primeiro acesso através do Perfil.
 				{isLider && <span class="block mt-2">Como Líder, você pode adicionar membros e líderes em treinamento à sua célula.</span>}
 			</p>
 

@@ -1,6 +1,5 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function sendInviteEmail(email: string, name: string, token: string) {
   const domain = process.env.PUBLIC_SITE_URL || 'http://localhost:4321';
@@ -16,6 +15,7 @@ export async function sendInviteEmail(email: string, name: string, token: string
   }
 
   try {
+    const resend = new Resend(process.env.RESEND_API_KEY);
     const { data, error } = await resend.emails.send({
       from: 'Vida na Vida <onboarding@resend.dev>', // No futuro você pode usar seu domínio próprio
       to: [email],

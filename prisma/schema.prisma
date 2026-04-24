@@ -9,7 +9,7 @@ datasource db {
 }
 
 model account {
-  id                String  @id
+  id                String  @id @default(uuid())
   userId            String
   type              String
   provider          String
@@ -28,23 +28,23 @@ model account {
 }
 
 model cell {
-  id             String           @id
+  id             String           @id @default(uuid())
   name           String
   address        String?
   neighborhood   String?
   dayOfWeek      Int?
   time           String?
   createdAt      DateTime         @default(now())
-  updatedAt      DateTime
+  updatedAt      DateTime         @updatedAt
   leaderId       String?          @unique(map: "Cell_leaderId_key")
-  user           user?            @relation(fields: [leaderId], references: [id], map: "Cell_leaderId_fkey")
+  leader         user?            @relation("CurrentCellLeader", fields: [leaderId], references: [id], map: "Cell_leaderId_fkey")
   cellmembership cellmembership[]
-  meeting        meeting[]
-  visitor        visitor[]
+  meetings       meeting[]
+  visitors       visitor[]
 }
 
 model cellmembership {
-  id         String                    @id
+  id         String                    @id @default(uuid())
   startDate  DateTime                  @default(now())
   endDate    DateTime?
   roleAtTime cellmembership_roleAtTime @default(MEMBRO)
@@ -58,33 +58,33 @@ model cellmembership {
 }
 
 model meeting {
-  id        String     @id
+  id        String     @id @default(uuid())
   date      DateTime
   topic     String?
   report    String?
   photoUrl  String?
   createdAt DateTime   @default(now())
-  updatedAt DateTime
+  updatedAt DateTime   @updatedAt
   cellId    String
   cell      cell       @relation(fields: [cellId], references: [id], onDelete: Cascade, map: "Meeting_cellId_fkey")
-  presence  presence[]
-  visitor   visitor[]
+  presences      presence[]
+  visitors       visitor[]
 
   @@index([cellId], map: "Meeting_cellId_fkey")
 }
 
 model notice {
-  id        String   @id
+  id        String   @id @default(uuid())
   title     String
   content   String
   imageUrl  String?
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
-  updatedAt DateTime
+  updatedAt DateTime @updatedAt
 }
 
 model presence {
-  id           String  @id
+  id           String  @id @default(uuid())
   isPresent    Boolean @default(true)
   observations String?
   meetingId    String
@@ -97,7 +97,7 @@ model presence {
 }
 
 model session {
-  id           String   @id
+  id           String   @id @default(uuid())
   sessionToken String   @unique(map: "Session_sessionToken_key")
   userId       String
   expires      DateTime
@@ -107,7 +107,7 @@ model session {
 }
 
 model user {
-  id             String           @id
+  id             String           @id @default(uuid())
   name           String?
   email          String?          @unique(map: "User_email_key")
   emailVerified  DateTime?
@@ -121,13 +121,13 @@ model user {
   city           String?
   neighborhood   String?
   createdAt      DateTime         @default(now())
-  updatedAt      DateTime
-  account        account[]
-  cell           cell?
-  cellmembership cellmembership[]
-  presence       presence[]
-  session        session[]
-  visitor        visitor[]
+  updatedAt      DateTime         @updatedAt
+  accounts       account[]
+  sessions       session[]
+  ledCell        cell?            @relation("CurrentCellLeader")
+  cellHistory    cellmembership[]
+  presences      presence[]
+  invitedVisitors visitor[] @relation("VisitorInviter")
 }
 
 model verificationtoken {
@@ -139,7 +139,7 @@ model verificationtoken {
 }
 
 model visitor {
-  id           String   @id
+  id           String   @id @default(uuid())
   name         String
   phone        String?
   observations String?
@@ -148,7 +148,7 @@ model visitor {
   cellId       String?
   meetingId    String?
   cell         cell?    @relation(fields: [cellId], references: [id], map: "Visitor_cellId_fkey")
-  user         user?    @relation(fields: [invitedById], references: [id], map: "Visitor_invitedById_fkey")
+  invitedBy    user?    @relation("VisitorInviter", fields: [invitedById], references: [id], map: "Visitor_invitedById_fkey")
   meeting      meeting? @relation(fields: [meetingId], references: [id], map: "Visitor_meetingId_fkey")
 
   @@index([cellId], map: "Visitor_cellId_fkey")

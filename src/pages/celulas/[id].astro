@@ -196,15 +196,15 @@ if (Astro.request.method === 'POST') {
 
 		{/* Formulário para adicionar membro - visível apenas para quem pode gerenciar */}
 		{canManageCell && (
-			<form method="POST" class="mt-4 flex items-center gap-3">
+			<form method="POST" class="mt-4 flex flex-col sm:flex-row gap-3">
 				<input type="hidden" name="action" value="add_member" />
-				<select name="userId" class="px-4 py-2 rounded-2xl border border-gray-100 bg-gray-50 text-sm">
+				<select name="userId" class="w-full sm:flex-1 px-4 py-3 rounded-2xl border border-gray-100 bg-gray-50 text-sm appearance-none truncate">
 					<option value="">Selecione um usuário...</option>
 					{availableUsers.map(u => (
 						<option value={u.id}>{u.name} ({u.role})</option>
 					))}
 				</select>
-				<button type="submit" class="px-4 py-2 rounded-2xl bg-brand-primary text-white text-sm">Adicionar</button>
+				<button type="submit" class="w-full sm:w-auto px-6 py-3 rounded-2xl bg-brand-primary text-white text-sm font-bold">Adicionar</button>
 			</form>
 		)}
 				</div>

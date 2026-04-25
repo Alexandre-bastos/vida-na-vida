@@ -7,7 +7,7 @@ import prisma from '../../lib/prisma';
 const session = await getSession(Astro.request);
 if (!session) return Astro.redirect('/login');
 
-const userRole = (session.user as any)?.role || 'MEMBRO';
+const userRole = ((session.user as any)?.role || 'MEMBRO').toUpperCase();
 if (userRole === 'MEMBRO') return Astro.redirect('/');
 
 // Buscar todos os usuários
@@ -15,10 +15,9 @@ const users = await prisma.user.findMany({
   orderBy: { name: 'asc' }
 });
 
-const userRole = (session.user as any)?.role || 'MEMBRO';
 const isAdmin = userRole === 'ADMIN';
 const isCoordinator = userRole === 'COORDENADOR';
-const isLider = userRole === 'LIDER' || userRole === 'LIDER_TREINAMENTO';
+const isLider = userRole.startsWith('LIDER');
 const canAddMembers = isAdmin || isCoordinator || isLider;
 
 const roleColors: Record<string, string> = {

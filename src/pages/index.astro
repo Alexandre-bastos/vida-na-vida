@@ -9,6 +9,7 @@ const session = await getSession(Astro.request);
 if (!session) return Astro.redirect('/login');
 
 const firstName = session?.user?.name?.split(' ')[0] || 'Líder';
+const userId = (session?.user as any)?.id;
 const userRole = ((session?.user as any)?.role || 'MEMBRO').toUpperCase();
 const isAdmin = userRole === 'ADMIN';
 const isCoordinator = userRole === 'COORDENADOR';
@@ -25,10 +26,22 @@ const now = new Date();
 const todayDay = now.getDay(); // 0=Dom, 1=Seg...
 const isSunday = todayDay === 0;
 
+// Filtro de acesso para a agenda
+let cellAccessFilter = {};
+if (!(isAdmin || isCoordinator)) {
+	cellAccessFilter = {
+		OR: [
+			{ leaderId: userId },
+			{ memberships: { some: { userId, endDate: null } } }
+		]
+	};
+}
+
 // Buscar todas as células que têm dia de encontro entre Segunda (1) e Sábado (6)
 const upcomingCells = await prisma.cell.findMany({
 	where: {
-		dayOfWeek: { gte: 1, lte: 6 }
+		dayOfWeek: { gte: 1, lte: 6 },
+		...cellAccessFilter
 	},
 	orderBy: [
 		{ dayOfWeek: 'asc' },

@@ -25,3 +25,4 @@ pnpm-debug.log*
 
 /src/generated/prisma
 .vercel
+_backup_sistema_estavel

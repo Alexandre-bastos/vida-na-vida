@@ -9,10 +9,9 @@ if (!session) return Astro.redirect('/login');
 
 // Definir permissões de visualização
 const userId = (session.user as any)?.id;
-const userRole = (session.user as any)?.role || 'MEMBRO';
+const userRole = ((session.user as any)?.role || 'MEMBRO').toUpperCase();
 const isAdmin = userRole === 'ADMIN';
 const isCoordinator = userRole === 'COORDENADOR';
-const isLeader = userRole === 'LIDER' || userRole === 'LIDER_TREINAMENTO';
 
 let whereClause = {};
 if (isAdmin || isCoordinator) {

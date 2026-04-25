@@ -3,9 +3,10 @@ import { Home, Users, CalendarCheck, UserCircle, UserPlus, BarChart2 } from 'luc
 import { getSession } from 'auth-astro/server';
 
 const session = await getSession(Astro.request);
-const userRole = (session?.user as any)?.role || 'MEMBRO';
+const userRole = ((session?.user as any)?.role || 'MEMBRO').toUpperCase();
 const isAdmin = userRole === 'ADMIN';
 const isCoordinator = userRole === 'COORDENADOR';
+const isLider = userRole.startsWith('LIDER');
 ---
 <nav class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 z-50 md:hidden" style="padding-bottom: env(safe-area-inset-bottom);">
   <div class="flex justify-around items-center h-16">
@@ -27,7 +28,7 @@ const isCoordinator = userRole === 'COORDENADOR';
       </a>
     )}
 
-    {(isAdmin || isCoordinator || userRole.startsWith('LIDER')) && (
+    {(isAdmin || isCoordinator || isLider) && (
       <a href="/membros" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-brand-primary transition-colors">
         <UserPlus size={22} />
         <span class="text-[10px] font-medium mt-1">Membros</span>
@@ -41,7 +42,7 @@ const isCoordinator = userRole === 'COORDENADOR';
       </a>
     )}
 
-    {(isAdmin || isCoordinator || userRole.startsWith('LIDER')) && (
+    {(isAdmin || isCoordinator || isLider) && (
       <a href="/presenca" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-brand-primary transition-colors">
         <CalendarCheck size={22} />
         <span class="text-[10px] font-medium mt-1">Presença</span>

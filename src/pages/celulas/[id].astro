@@ -99,10 +99,33 @@ if (Astro.request.method === 'POST') {
 	if (action === 'remove_member') {
         const membershipId = formData.get('membershipId')?.toString();
         if (membershipId) {
-            await prisma.cellmembership.update({
+            // Validar permissão de exclusão (Hierarquia)
+            const membershipToRemove = await prisma.cellmembership.findUnique({
                 where: { id: membershipId },
-                data: { endDate: new Date() }
+                include: { user: true }
             });
+
+            if (membershipToRemove) {
+                const targetRole = membershipToRemove.user.role;
+                let canRemove = false;
+
+                if (isAdmin || isCoordinator) {
+                    canRemove = true;
+                } else if (userRole === 'LIDER') {
+                    // Lider só pode excluir MEMBRO e LIDER_TREINAMENTO
+                    canRemove = targetRole === 'MEMBRO' || targetRole === 'LIDER_TREINAMENTO';
+                } else if (userRole === 'LIDER_TREINAMENTO') {
+                    // Lider em treinamento só pode excluir MEMBRO
+                    canRemove = targetRole === 'MEMBRO';
+                }
+
+                if (canRemove) {
+                    await prisma.cellmembership.update({
+                        where: { id: membershipId },
+                        data: { endDate: new Date() }
+                    });
+                }
+            }
             return Astro.redirect(`/celulas/${id}`);
         }
     }
@@ -235,9 +258,11 @@ if (Astro.request.method === 'POST') {
 				<form method="POST" class="flex flex-col sm:flex-row w-full sm:w-auto gap-3">
 					<input type="hidden" name="action" value="set_leader" />
 					<select name="leaderId" class="w-full sm:flex-1 px-4 py-3 rounded-2xl border border-gray-100 bg-gray-50 text-sm appearance-none truncate">
-						<option value="">Selecione um usuário...</option>
-						{[...cell.memberships.map(m => m.user), ...availableUsers].map(u => (
-							<option value={u.id} selected={cell.leader?.id === u.id}>{u.name} ({u.role})</option>
+						<option value="">Selecione um líder...</option>
+						{[...cell.memberships.map(m => m.user), ...availableUsers]
+                            .filter(u => u.role === 'LIDER')
+                            .map(u => (
+							<option value={u.id} selected={cell.leader?.id === u.id}>{u.name} (Líder)</option>
 						))}
 					</select>
 					<button type="submit" class="w-full sm:w-auto px-6 py-3 rounded-2xl bg-brand-primary text-white text-sm font-bold shrink-0">Definir</button>

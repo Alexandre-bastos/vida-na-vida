@@ -15,6 +15,20 @@ const isAdmin = userRole === 'ADMIN';
 const isCoordinator = userRole === 'COORDENADOR';
 const isLider = userRole.startsWith('LIDER');
 
+// Verificar se o usuário está com a senha/login padrão (Segurança)
+import bcrypt from 'bcryptjs';
+const currentUser = await prisma.user.findUnique({ 
+    where: { id: userId },
+    select: { email: true, password: true } 
+});
+
+const isDefaultAuth = currentUser?.email === 'vidanavida' || 
+                     (currentUser?.password && bcrypt.compareSync('vidanavida', currentUser.password));
+
+if (isDefaultAuth) {
+    return Astro.redirect('/perfil?forceChange=1');
+}
+
 // 1. Buscar Avisos Ativos (Carrossel)
 const activeNotices = await prisma.notice.findMany({
 	where: { active: true },

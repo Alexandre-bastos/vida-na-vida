@@ -51,11 +51,30 @@ if (Astro.request.method === 'POST') {
     }
     
     if (!error) {
+      // Validar duplicidades (Nome, Email, Telefone)
+      const existingUser = await prisma.user.findFirst({
+        where: {
+          OR: [
+            { email: email },
+            { phone: phone ? phone : undefined },
+            { name: name }
+          ]
+        }
+      });
+
+      if (existingUser) {
+        if (existingUser.email === email) error = 'Este e-mail já está cadastrado.';
+        else if (existingUser.phone === phone) error = 'Este telefone já está cadastrado em outro perfil.';
+        else if (existingUser.name === name) error = 'Já existe um membro cadastrado com este nome exato.';
+      }
+    }
+
+    if (!error) {
       // 1. Criar o usuário (sem senha)
       const user = await prisma.user.create({
         data: {
-          name,
-          email,
+          name: name!,
+          email: email!,
           phone,
           role: (role as any) || 'MEMBRO',
           birthDate: birthDate ? new Date(birthDate) : null,

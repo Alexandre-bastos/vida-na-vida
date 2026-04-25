@@ -34,7 +34,14 @@ const isCoordinator = userRole === 'COORDENADOR';
       </a>
     )}
 
-    {!(isAdmin || isCoordinator) && (
+    {userRole === 'MEMBRO' && (
+      <a href="/minha-celula" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-brand-primary transition-colors">
+        <Users size={22} />
+        <span class="text-[10px] font-medium mt-1">Minha Célula</span>
+      </a>
+    )}
+
+    {(isAdmin || isCoordinator || userRole.startsWith('LIDER')) && (
       <a href="/presenca" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-brand-primary transition-colors">
         <CalendarCheck size={22} />
         <span class="text-[10px] font-medium mt-1">Presença</span>

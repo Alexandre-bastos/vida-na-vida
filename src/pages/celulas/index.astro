@@ -14,14 +14,12 @@ const isAdmin = userRole === 'ADMIN';
 const isCoordinator = userRole === 'COORDENADOR';
 const isLeader = userRole === 'LIDER' || userRole === 'LIDER_TREINAMENTO';
 
-// Filtro direto: apenas células onde o usuário tem membership ativo
 let whereClause = {};
 if (isAdmin || isCoordinator) {
   // Administradores e coordenadores veem todas as células
   whereClause = {};
-} else if (isLeader) {
-  // Líderes e líderes de treinamento veem apenas as células onde são líderes
-  // ou onde têm membership ativo
+} else {
+  // Líderes e Membros veem apenas as células onde estão vinculados
   whereClause = {
     OR: [
       { leaderId: userId },

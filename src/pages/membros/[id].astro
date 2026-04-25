@@ -9,11 +9,9 @@ const session = await getSession(Astro.request);
 if (!session) return Astro.redirect('/login');
 
 const { id } = Astro.params;
-const userRole = session.user?.role;
+const userRole = session.user?.role || 'MEMBRO';
 
-if (!userRole) {
-  return new Response(null, { status: 302, headers: { location: '/login' } });
-}
+if (userRole === 'MEMBRO') return Astro.redirect('/');
 
 const isAdmin = userRole === 'ADMIN';
 const isCoordinator = userRole === 'COORDENADOR';

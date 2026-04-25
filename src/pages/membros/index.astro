@@ -7,6 +7,9 @@ import prisma from '../../lib/prisma';
 const session = await getSession(Astro.request);
 if (!session) return Astro.redirect('/login');
 
+const userRole = (session.user as any)?.role || 'MEMBRO';
+if (userRole === 'MEMBRO') return Astro.redirect('/');
+
 // Buscar todos os usuários
 const users = await prisma.user.findMany({
   orderBy: { name: 'asc' }

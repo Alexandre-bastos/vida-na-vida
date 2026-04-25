@@ -13,12 +13,17 @@ if (!userRole) {
   return new Response(null, { status: 302, headers: { location: '/login' } });
 }
 
-if (!['LIDER', 'LIDER_TREINAMENTO'].includes(userRole)) {
+if (!['LIDER', 'LIDER_TREINAMENTO', 'MEMBRO'].includes(userRole)) {
   return Astro.redirect('/celulas');
 }
 
 const cells = await prisma.cell.findMany({
-  where: { leaderId: userId },
+  where: {
+    OR: [
+      { leaderId: userId },
+      { memberships: { some: { userId, endDate: null } } }
+    ]
+  },
   include: { leader: true }
 });
 

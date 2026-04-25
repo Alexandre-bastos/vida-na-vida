@@ -32,14 +32,26 @@ let whereClause: any = {};
 
 if (!isAdmin && !isCoordinator) {
     // Líderes e LTs só veem:
-    // 1. Membros de sua(s) célula(s)
-    // 2. Membros sem célula
-    // 3. NUNCA Admin ou Coordenador
+    // 1. Membros de sua(s) célula(s) (via membership)
+    // 2. Líderes de sua(s) célula(s) (via ledCell)
+    // 3. Membros sem célula E que não lideram nenhuma célula
+    // 4. NUNCA Admin ou Coordenador
     whereClause = {
         role: { notIn: ['ADMIN', 'COORDENADOR'] },
         OR: [
+            // Membros da minha célula
             { cellHistory: { some: { cellId: { in: myCellIds }, endDate: null } } },
-            { cellHistory: { none: { endDate: null } } }
+            // Eu mesmo (se for líder)
+            { id: userId },
+            // Líderes das minhas células (caso eu seja LT)
+            { ledCell: { id: { in: myCellIds } } },
+            // Pessoas realmente sem célula (não são membros de nada E não lideram nada)
+            { 
+                AND: [
+                    { cellHistory: { none: { endDate: null } } },
+                    { ledCell: { is: null } }
+                ]
+            }
         ]
     };
 }

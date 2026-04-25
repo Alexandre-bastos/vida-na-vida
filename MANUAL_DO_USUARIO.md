@@ -14,6 +14,25 @@ Comunidade Cristã Vida na Vida
 2. Informe seu **e-mail** e **senha**.
 3. Clique em **Entrar no Sistema**.
 
+---
+
+## 1.1 Uso no Celular (Modo Aplicativo)
+
+O sistema foi otimizado para funcionar como um aplicativo no seu celular, ocultando a barra de endereços e aproveitando melhor a tela.
+
+### No Android (Chrome)
+1. Ao acessar o site pela primeira vez, o navegador poderá exibir um banner: **"Adicionar à tela inicial"**. Toque nele.
+2. Caso não apareça, toque nos **três pontinhos** (menu) no canto superior direito e selecione **"Instalar aplicativo"** ou **"Adicionar à tela inicial"**.
+
+### No iPhone (Safari)
+1. Com o site aberto, toque no ícone de **Compartilhar** (quadrado com uma seta para cima) na barra inferior.
+2. Role as opções para baixo e toque em **"Adicionar à Tela de Início"**.
+3. Confirme clicando em **"Adicionar"** no canto superior direito.
+
+> **Dica:** Ao abrir o sistema pelo ícone criado na tela inicial, ele funcionará em tela cheia, sem a barra do navegador, parecendo um aplicativo nativo.
+
+---
+
 > **Primeiro acesso?** A senha padrão é `vidanavida`. Troque-a imediatamente pelo menu **Perfil**.
 
 ---

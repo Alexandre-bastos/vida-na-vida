@@ -171,3 +171,13 @@ enum user_role {
   LIDER_TREINAMENTO
   MEMBRO
 }
+
+model lesson {
+  id        String   @id @default(uuid())
+  title     String
+  fileUrl   String
+  fileName  String?
+  active    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

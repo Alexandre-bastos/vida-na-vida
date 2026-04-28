@@ -1,6 +1,6 @@
 ---
 import AppLayout from '../layouts/AppLayout.astro';
-import { Calendar, Users, Megaphone, ArrowRight, UserPlus } from 'lucide-react';
+import { Calendar, Users, Megaphone, ArrowRight, UserPlus, BookOpen, Download } from 'lucide-react';
 import { getSession } from 'auth-astro/server';
 
 import prisma from '../lib/prisma';
@@ -31,6 +31,12 @@ if (isDefaultAuth) {
 
 // 1. Buscar Avisos Ativos (Carrossel)
 const activeNotices = await prisma.notice.findMany({
+	where: { active: true },
+	orderBy: { createdAt: 'desc' }
+});
+
+// 1.5 Buscar Lição Ativa
+const activeLesson = await prisma.lesson.findFirst({
 	where: { active: true },
 	orderBy: { createdAt: 'desc' }
 });
@@ -194,6 +200,28 @@ const profileUpdated = Astro.url.searchParams.get('profile_updated') === '1';
 					.scrollbar-hide::-webkit-scrollbar { display: none; }
 					.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 				</style>
+			</section>
+		)}
+
+		<!-- Lição Atual -->
+		{activeLesson && (
+			<section class="bg-gradient-to-r from-brand-primary to-brand-accent p-1 rounded-3xl shadow-sm">
+				<div class="bg-white rounded-[1.4rem] p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+					<div class="flex items-center gap-4">
+						<div class="w-12 h-12 rounded-xl bg-brand-light/30 text-brand-primary flex items-center justify-center shrink-0">
+							<BookOpen size={24} />
+						</div>
+						<div>
+							<span class="text-[10px] font-bold text-brand-primary uppercase tracking-widest">Lição da Semana</span>
+							<h3 class="font-bold text-brand-dark mt-0.5">{activeLesson.title}</h3>
+							<p class="text-xs text-gray-500 mt-1 line-clamp-1">{activeLesson.fileName || 'Material da célula'}</p>
+						</div>
+					</div>
+					<a href={activeLesson.fileUrl} target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 bg-brand-primary text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg shadow-brand-primary/20 hover:brightness-110 transition-all shrink-0 w-full sm:w-auto">
+						<Download size={16} />
+						Baixar Lição
+					</a>
+				</div>
 			</section>
 		)}
 

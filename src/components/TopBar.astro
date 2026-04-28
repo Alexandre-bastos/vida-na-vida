@@ -1,5 +1,5 @@
 ---
-import { User, Bell, LogOut, UserPlus, Users, Megaphone } from 'lucide-react';
+import { User, Bell, LogOut, UserPlus, Users, Megaphone, BookOpen } from 'lucide-react';
 import { getSession } from 'auth-astro/server';
 
 const session = await getSession(Astro.request);
@@ -50,6 +50,12 @@ function roleLabel(role) {
       <a href="/relatorios/avisos" class="hidden sm:flex items-center gap-2 px-4 py-2 text-gray-500 hover:text-brand-primary font-bold text-[11px] uppercase tracking-wider transition-all">
         <Megaphone size={16} />
         Avisos
+      </a>
+    )}
+    {(isAdmin || isCoordinator) && (
+      <a href="/licoes" class="hidden sm:flex items-center gap-2 px-4 py-2 text-gray-500 hover:text-brand-primary font-bold text-[11px] uppercase tracking-wider transition-all">
+        <BookOpen size={16} />
+        Lições
       </a>
     )}
     

@@ -138,7 +138,7 @@ const isDefaultLogin = user.email === 'vidanavida';
           </div>
           <label class="absolute bottom-0 right-0 w-10 h-10 bg-brand-primary text-white rounded-full flex items-center justify-center shadow-lg cursor-pointer hover:scale-110 transition-transform">
             <Camera size={18} />
-            <input type="file" name="image" accept="image/*" class="hidden" onchange="const reader = new FileReader(); reader.onload = (e) => document.getElementById('preview').src = e.target.result; reader.readAsDataURL(this.files[0])" />
+            <input type="file" name="image" accept="image/*" class="hidden" id="image-input" />
           </label>
         </div>
 
@@ -280,6 +280,42 @@ const isDefaultLogin = user.email === 'vidanavida';
       
       e.target.value = value;
     });
+  });
+
+  // Compressão de Imagem
+  import { compressImage } from '../lib/image-compression';
+
+  const imageInput = document.getElementById('image-input') as HTMLInputElement;
+  const previewImg = document.getElementById('preview') as HTMLImageElement;
+
+  imageInput?.addEventListener('change', async (e: any) => {
+    const target = e.target as HTMLInputElement;
+    if (!target.files || target.files.length === 0) return;
+
+    const file = target.files[0];
+    
+    // Preview imediato
+    const reader = new FileReader();
+    reader.onload = (re: any) => {
+      if (previewImg) previewImg.src = re.target.result;
+    };
+    reader.readAsDataURL(file);
+
+    // Comprimir se for imagem grande
+    if (file.type.startsWith('image/')) {
+        try {
+            const compressedFile = await compressImage(file);
+            
+            // Substitui o arquivo no input usando DataTransfer
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(compressedFile);
+            target.files = dataTransfer.files;
+            
+            console.log(`Imagem comprimida: de ${(file.size / 1024).toFixed(1)}KB para ${(compressedFile.size / 1024).toFixed(1)}KB`);
+        } catch (err) {
+            console.error('Erro ao comprimir imagem:', err);
+        }
+    }
   });
 </script>
 

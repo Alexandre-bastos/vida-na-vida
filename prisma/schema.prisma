@@ -28,19 +28,19 @@ model account {
 }
 
 model cell {
-  id             String           @id @default(uuid())
-  name           String
-  address        String?
-  neighborhood   String?
-  dayOfWeek      Int?
-  time           String?
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  leaderId       String?          @unique(map: "Cell_leaderId_key")
-  leader         user?            @relation("CurrentCellLeader", fields: [leaderId], references: [id], map: "Cell_leaderId_fkey")
-  memberships    cellmembership[]
-  meetings       meeting[]
-  visitors       visitor[]
+  id           String           @id @default(uuid())
+  name         String
+  address      String?
+  neighborhood String?
+  dayOfWeek    Int?
+  time         String?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  leaderId     String?          @unique(map: "Cell_leaderId_key")
+  leader       user?            @relation("CurrentCellLeader", fields: [leaderId], references: [id], map: "Cell_leaderId_fkey")
+  memberships  cellmembership[]
+  meetings     meeting[]
+  visitors     visitor[]
 }
 
 model cellmembership {
@@ -67,8 +67,8 @@ model meeting {
   updatedAt DateTime   @updatedAt
   cellId    String
   cell      cell       @relation(fields: [cellId], references: [id], onDelete: Cascade, map: "Meeting_cellId_fkey")
-  presences      presence[]
-  visitors       visitor[]
+  presences presence[]
+  visitors  visitor[]
 
   @@index([cellId], map: "Meeting_cellId_fkey")
 }
@@ -107,27 +107,27 @@ model session {
 }
 
 model user {
-  id             String           @id @default(uuid())
-  name           String?
-  email          String?          @unique(map: "User_email_key")
-  emailVerified  DateTime?
-  image          String?
-  password       String?
-  role           user_role        @default(MEMBRO)
-  active         Boolean          @default(true)
-  phone          String?
-  birthDate      DateTime?
-  gender         String?
-  city           String?
-  neighborhood   String?
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  accounts       account[]
-  sessions       session[]
-  ledCell        cell?            @relation("CurrentCellLeader")
-  cellHistory    cellmembership[]
-  presences      presence[]
-  invitedVisitors visitor[] @relation("VisitorInviter")
+  id              String           @id @default(uuid())
+  name            String?
+  email           String?          @unique(map: "User_email_key")
+  emailVerified   DateTime?
+  image           String?
+  password        String?
+  role            user_role        @default(MEMBRO)
+  active          Boolean          @default(true)
+  phone           String?
+  birthDate       DateTime?
+  gender          String?
+  city            String?
+  neighborhood    String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  accounts        account[]
+  ledCell         cell?            @relation("CurrentCellLeader")
+  cellHistory     cellmembership[]
+  presences       presence[]
+  sessions        session[]
+  invitedVisitors visitor[]        @relation("VisitorInviter")
 }
 
 model verificationtoken {

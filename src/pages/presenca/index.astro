@@ -66,14 +66,30 @@ if (qDate) {
   whereClause.date = { gte: startDate, lt: endDate };
 }
 
-const meetingsList = await prisma.meeting.findMany({
+const meetingsListRaw = await prisma.meeting.findMany({
   where: whereClause,
   include: { 
-    _count: { select: { presences: true, visitors: true } }, 
+    presences: { select: { isPresent: true } },
+    _count: { select: { visitors: true } }, 
     cell: true 
   },
   orderBy: { date: 'desc' },
   take: 50
+});
+
+const meetingsList = meetingsListRaw.map(m => {
+  const total = m.presences.length;
+  const presentes = m.presences.filter(p => p.isPresent).length;
+  const ausentes = total - presentes;
+  return {
+    ...m,
+    stats: {
+      total,
+      presentes,
+      ausentes,
+      visitors: m._count.visitors
+    }
+  };
 });
 ---
 
@@ -157,9 +173,10 @@ const meetingsList = await prisma.meeting.findMany({
                     <span class="text-xs text-gray-400 font-medium">{new Date(m.date).toLocaleDateString()}</span>
                   </div>
                   <div class="font-bold text-gray-800 text-lg">{m.topic || 'Encontro da Célula'}</div>
-                  <div class="text-sm text-gray-500 mt-1 flex gap-3">
-                    <span class="flex items-center gap-1">👥 {m._count.presences} presenças</span>
-                    {m._count.visitors > 0 && <span class="flex items-center gap-1">👋 {m._count.visitors} visitantes</span>}
+                  <div class="text-sm text-gray-500 mt-1 flex flex-wrap gap-3">
+                    <span class="flex items-center gap-1 font-medium text-green-600 bg-green-50 px-2 py-0.5 rounded-md">✅ {m.stats.presentes} presentes</span>
+                    {m.stats.ausentes > 0 && <span class="flex items-center gap-1 font-medium text-red-500 bg-red-50 px-2 py-0.5 rounded-md">❌ {m.stats.ausentes} ausentes</span>}
+                    {m.stats.visitors > 0 && <span class="flex items-center gap-1 font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">👋 {m.stats.visitors} visitantes</span>}
                   </div>
                 </div>
               </div>

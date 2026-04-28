@@ -88,10 +88,37 @@ if (Astro.request.method === 'POST') {
             </div>
             <span id="file-name">Clique para anexar uma foto</span>
           </div>
-          <input type="file" name="image" accept="image/*" class="hidden" onchange="document.getElementById('file-name').innerText = this.files[0].name" />
+          <input type="file" name="image" accept="image/*" class="hidden" id="image-input" />
         </label>
       </div>
     </div>
+
+    <script>
+      import { compressImage } from '../../../lib/image-compression';
+      
+      const imageInput = document.getElementById('image-input') as HTMLInputElement;
+      const fileNameDisplay = document.getElementById('file-name');
+      
+      imageInput?.addEventListener('change', async (e: any) => {
+        const target = e.target as HTMLInputElement;
+        if (!target.files || target.files.length === 0) return;
+
+        const file = target.files[0];
+        if (fileNameDisplay) fileNameDisplay.innerText = file.name;
+        
+        if (file.type.startsWith('image/')) {
+          try {
+            const compressedFile = await compressImage(file);
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(compressedFile);
+            target.files = dataTransfer.files;
+            if (fileNameDisplay) fileNameDisplay.innerText = compressedFile.name + " (comprimida)";
+          } catch (err) {
+            console.error('Erro ao comprimir imagem:', err);
+          }
+        }
+      });
+    </script>
 
     <div class="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl">
       <label class="relative inline-flex items-center cursor-pointer">

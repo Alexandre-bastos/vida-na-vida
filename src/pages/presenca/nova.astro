@@ -111,13 +111,24 @@ if (Astro.request.method === 'POST') {
 
   // Create presences
   const presencePromises = [];
-  for (const [key, value] of Array.from(formData.entries())) {
-    if (typeof key === 'string' && key.startsWith('presence_')) {
-      const uid = key.replace('presence_', '');
-      const isPresent = value === 'on' || value === 'true';
-      const obs = formData.get(`observation_${uid}`)?.toString() || null;
-      presencePromises.push(prisma.presence.create({ data: { meetingId: finalMeetingId, userId: uid, isPresent, observations: obs } }));
-    }
+  const entries = Array.from(formData.entries());
+  
+  // Identificar todos os IDs de usuários através dos campos hidden (member_ID)
+  const userIdsInForm = entries
+    .filter(([key]) => key.startsWith('member_'))
+    .map(([key]) => key.replace('member_', ''));
+
+  for (const uid of userIdsInForm) {
+    const isPresent = formData.get(`presence_${uid}`) === 'on';
+    const obs = formData.get(`observation_${uid}`)?.toString() || null;
+    presencePromises.push(prisma.presence.create({ 
+      data: { 
+        meetingId: finalMeetingId, 
+        userId: uid, 
+        isPresent, 
+        observations: obs 
+      } 
+    }));
   }
   await Promise.all(presencePromises);
 
@@ -186,7 +197,7 @@ if (Astro.request.method === 'POST') {
                 <Camera size={18} />
                 <span>Clique para anexar uma foto</span>
               </div>
-              <input type="file" name="photo" accept="image/*" class="hidden" />
+              <input type="file" name="photo" accept="image/*" class="hidden" id="photo-input" />
             </label>
           </div>
           
@@ -210,6 +221,7 @@ if (Astro.request.method === 'POST') {
                   <div>
                     <div class="font-bold text-gray-800">{m.user.name}</div>
                     <div class="text-xs text-gray-500 font-medium">{m.user.role}</div>
+                    <input type="hidden" name={`member_${m.user.id}`} value="1" />
                   </div>
                 </div>
                 
@@ -243,6 +255,8 @@ if (Astro.request.method === 'POST') {
   </div>
 
   <script type="module">
+  import { compressImage } from '../../lib/image-compression';
+
   const postForm = document.getElementById('presenca-form');
   if (postForm) {
     postForm.addEventListener('submit', () => {
@@ -254,6 +268,24 @@ if (Astro.request.method === 'POST') {
       }
     });
   }
+
+  const photoInput = document.getElementById('photo-input');
+  photoInput?.addEventListener('change', async (e) => {
+    const target = e.target;
+    if (!target.files || target.files.length === 0) return;
+
+    const file = target.files[0];
+    if (file.type.startsWith('image/')) {
+      try {
+        const compressedFile = await compressImage(file);
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(compressedFile);
+        target.files = dataTransfer.files;
+      } catch (err) {
+        console.error('Erro ao comprimir imagem:', err);
+      }
+    }
+  });
   </script>
 </AppLayout>
 

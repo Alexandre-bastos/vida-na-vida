@@ -1,5 +1,5 @@
 ---
-import { Home, Users, CalendarCheck, UserCircle, UserPlus, BarChart2 } from 'lucide-react';
+import { Home, Users, CalendarCheck, UserCircle, UserPlus, BarChart2, BookOpen } from 'lucide-react';
 import { getSession } from 'auth-astro/server';
 
 const session = await getSession(Astro.request);
@@ -53,6 +53,13 @@ const isLider = userRole.startsWith('LIDER');
       <a href="/relatorios" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-brand-primary transition-colors">
         <BarChart2 size={22} />
         <span class="text-[10px] font-medium mt-1">Relatórios</span>
+      </a>
+    )}
+
+    {(isAdmin || isCoordinator) && (
+      <a href="/licoes" class="flex flex-col items-center justify-center w-full h-full text-gray-400 hover:text-brand-primary transition-colors">
+        <BookOpen size={22} />
+        <span class="text-[10px] font-medium mt-1">Lições</span>
       </a>
     )}
     

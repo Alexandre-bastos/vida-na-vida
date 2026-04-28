@@ -191,11 +191,18 @@ if (Astro.request.method === 'POST') {
           <input name="topic" placeholder="Ex: Estudo sobre a passagem de João 3:16" class="w-full px-4 py-2.5 rounded-xl border bg-gray-50 focus:bg-white focus:ring-2 focus:ring-brand-primary/20 outline-none transition-all text-sm" value={meeting?.topic || ''} />
           
           <label class="block text-sm font-bold text-gray-700 mt-4 mb-2">Foto do Encontro (opcional)</label>
-          <div class="flex items-center gap-3">
-            <label class="flex-1 cursor-pointer">
-              <div class="w-full px-4 py-3 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors flex items-center justify-center gap-2 text-sm text-gray-500 font-medium">
-                <Camera size={18} />
-                <span>Clique para anexar uma foto</span>
+          <div class="flex flex-col sm:flex-row items-center gap-4">
+            <div id="photo-preview-container" class="hidden w-24 h-24 rounded-xl overflow-hidden border border-gray-200 shrink-0 relative">
+              <img id="photo-preview" src="" class="w-full h-full object-cover" />
+              <div id="photo-loading" class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center hidden">
+                <div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span class="text-[8px] text-white font-bold mt-1 uppercase">Processando</span>
+              </div>
+            </div>
+            <label class="flex-1 w-full cursor-pointer">
+              <div class="w-full px-4 py-6 border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors flex flex-col items-center justify-center gap-2 text-sm text-gray-500 font-medium">
+                <Camera size={24} class="text-brand-primary/50" />
+                <span id="photo-label">Clique para anexar uma foto</span>
               </div>
               <input type="file" name="photo" accept="image/*" class="hidden" id="photo-input" />
             </label>
@@ -270,11 +277,29 @@ if (Astro.request.method === 'POST') {
   }
 
   const photoInput = document.getElementById('photo-input');
+  const photoPreviewContainer = document.getElementById('photo-preview-container');
+  const photoPreview = document.getElementById('photo-preview');
+  const photoLoading = document.getElementById('photo-loading');
+  const photoLabel = document.getElementById('photo-label');
+
   photoInput?.addEventListener('change', async (e) => {
     const target = e.target;
     if (!target.files || target.files.length === 0) return;
 
     const file = target.files[0];
+    
+    if (photoPreviewContainer && photoPreview && photoLabel) {
+      photoPreviewContainer.classList.remove('hidden');
+      photoLabel.innerText = "Alterar foto";
+      if (photoLoading) photoLoading.classList.remove('hidden');
+      
+      const reader = new FileReader();
+      reader.onload = (re) => {
+        photoPreview.src = re.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
     if (file.type.startsWith('image/')) {
       try {
         const compressedFile = await compressImage(file);
@@ -283,7 +308,11 @@ if (Astro.request.method === 'POST') {
         target.files = dataTransfer.files;
       } catch (err) {
         console.error('Erro ao comprimir imagem:', err);
+      } finally {
+        if (photoLoading) photoLoading.classList.add('hidden');
       }
+    } else {
+      if (photoLoading) photoLoading.classList.add('hidden');
     }
   });
   </script>

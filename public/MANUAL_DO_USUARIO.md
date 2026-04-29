@@ -70,15 +70,20 @@ Aqui você pode:
 - Alterar seu **nome**, **sexo**, **cidade** e **bairro**.
 - Enviar ou trocar sua **foto de perfil**.
 - **Trocar sua senha** (mínimo 6 caracteres).
+- Preencher seu **Telefone** (com máscara automática).
 
-> **Importante:** Oriente todos os novos membros a trocarem a senha padrão no primeiro acesso.
+> **Importante:** O sistema agora possui um **Redirecionamento de Segurança**. Caso seu perfil esteja incompleto ou você ainda use a senha padrão, você será levado automaticamente para a página de Perfil para regularizar seus dados.
+
+> **Dica:** O envio de fotos agora é muito mais rápido! O sistema realiza a compressão da imagem automaticamente no seu aparelho antes de enviar.
 
 ---
 
 ### 3.3 🧑‍🤝‍🧑 Membros
 
 **Caminho:** Menu inferior → **Membros**  
-**Disponível para:** Administrador, Coordenador, Líder
+**Disponível para:** Administrador, Coordenador, Líder, Líder em Treinamento
+
+> **Visibilidade:** Administradores e Coordenadores veem todos os membros. Líderes e LTs veem os membros da sua própria célula e também membros que ainda não foram vinculados a nenhuma célula (**Não Alocados**).
 
 #### Cadastrar um novo membro
 1. Toque em **+ Novo Membro**.
@@ -180,6 +185,25 @@ Os avisos ativos são exibidos na tela inicial de todos os usuários.
 
 ---
 
+### 3.8 📖 Lições da Semana
+
+**Caminho:** Home (Destaque) ou Menu inferior → **Lições**  
+**Disponível para:** Todos (Leitura) / Administrador (Upload)
+
+Esta funcionalidade centraliza os materiais de estudo da semana.
+
+#### Para Administradores:
+1. Acesse o menu de gerenciamento de lições.
+2. Faça o upload do arquivo (PDF ou DOCX).
+3. O sistema manterá apenas **um arquivo ativo** por vez, que será exibido em destaque para toda a igreja.
+4. O histórico de lições anteriores permanece arquivado para consulta.
+
+#### Para Membros e Líderes:
+1. Toque no card de destaque na **Home** ou acesse o ícone de **Lições** no menu inferior.
+2. O material atual será baixado ou aberto diretamente no seu dispositivo.
+
+---
+
 ## 4. Minha Célula (Visão do Líder)
 
 **Caminho:** Menu inferior → **Minha Célula**  
@@ -188,7 +212,7 @@ Os avisos ativos são exibidos na tela inicial de todos os usuários.
 Líderes não veem a lista completa de células — apenas a **sua própria célula** com:
 - Lista dos membros vinculados.
 - Acesso rápido para registrar presença.
-- Possibilidade de adicionar novos membros.
+- Possibilidade de adicionar novos membros (vinculados ou não alocados).
 
 ---
 
@@ -207,6 +231,8 @@ Líderes não veem a lista completa de células — apenas a **sua própria cél
 | Registrar presença | ✅ | ✅ | ✅ | ✅ | ❌ |
 | Acessar relatórios | ✅ | ✅ | ❌ | ❌ | ❌ |
 | Criar/editar avisos | ✅ | ✅ | ❌ | ❌ | ❌ |
+| Gerenciar Lições | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Baixar Lição Ativa | ✅ | ✅ | ✅ | ✅ | ✅ |
 
 \* Apenas na própria célula.  
 \** Só pode criar usuários com cargo "Membro".
